@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — Jarvis AI Trading Assistant</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-color: #050505;
+      color: #F5F5F5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .auth-card {
+      background: linear-gradient(180deg, rgba(18, 18, 18, 0.9) 0%, rgba(10, 10, 10, 0.95) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px -10px rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-6">
+
+  <!-- Top Bar -->
+  <div class="max-w-7xl w-full mx-auto flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-3">
+      <svg class="w-7 h-7" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="14" stroke="#F5F5F5" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <polygon points="16,6 24,22 16,19 8,22" fill="#F5F5F5"/>
+        <circle cx="16" cy="14" r="2" fill="#050505"/>
+      </svg>
+      <span class="font-bold text-lg text-white">Jarvis</span>
+    </a>
+
+    <a href="index.html" class="inline-flex items-center gap-2 text-xs font-mono text-[#888] hover:text-white transition-colors">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      <span>Back to Homepage</span>
+    </a>
+  </div>
+
+  <!-- Center Auth Form Box -->
+  <div class="max-w-md w-full mx-auto my-12">
+    <div class="auth-card p-8 rounded-2xl">
+      
+      <!-- Tab Header -->
+      <div class="flex border-b border-[#222] mb-6">
+        <button id="tab-signin" onclick="switchAuthTab('signin')" class="flex-1 pb-3 text-xs font-semibold border-b-2 border-white text-white transition-all">Sign In</button>
+        <button id="tab-signup" onclick="switchAuthTab('signup')" class="flex-1 pb-3 text-xs font-semibold border-b-2 border-transparent text-[#777] transition-all">Create Account</button>
+      </div>
+
+      <!-- Sign In Form -->
+      <form id="form-signin" class="space-y-4">
+        <div>
+          <label class="block text-xs font-mono text-[#9E9E9E] mb-1.5">Registered Email</label>
+          <input type="email" required placeholder="trader@domain.com" class="w-full bg-[#050505] border border-[#222] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white transition-colors">
+        </div>
+        <div>
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="text-xs font-mono text-[#9E9E9E]">Password</label>
+            <a href="#" class="text-[11px] text-[#777] hover:text-white transition-colors">Forgot?</a>
+          </div>
+          <input type="password" required placeholder="••••••••" class="w-full bg-[#050505] border border-[#222] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white transition-colors">
+        </div>
+        <button type="submit" class="w-full bg-white text-black font-semibold text-xs py-3 rounded-xl hover:bg-[#E0E0E0] transition-all mt-2">
+          Sign In to Desktop Assistant
+        </button>
+      </form>
+
+      <!-- Sign Up Form (Initially Hidden) -->
+      <form id="form-signup" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-mono text-[#9E9E9E] mb-1.5">Your Email</label>
+          <input type="email" required placeholder="trader@domain.com" class="w-full bg-[#050505] border border-[#222] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white transition-colors">
+        </div>
+        <div>
+          <label class="block text-xs font-mono text-[#9E9E9E] mb-1.5">Create Master Password</label>
+          <input type="password" required placeholder="••••••••" class="w-full bg-[#050505] border border-[#222] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white transition-colors">
+        </div>
+        <button type="submit" class="w-full bg-white text-black font-semibold text-xs py-3 rounded-xl hover:bg-[#E0E0E0] transition-all mt-2">
+          Create Trader Account
+        </button>
+      </form>
+
+      <!-- OAuth Separator -->
+      <div class="relative my-6">
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-[#222]"></div></div>
+        <div class="relative flex justify-center text-[10px] uppercase font-mono"><span class="bg-[#0C0C0C] px-3 text-[#666]">Or Connect Via</span></div>
+      </div>
+
+      <!-- Quick OAuth Buttons -->
+      <div class="grid grid-cols-2 gap-3">
+        <button type="button" class="flex items-center justify-center gap-2 py-2.5 border border-[#222] rounded-xl text-xs text-white hover:border-[#444] transition-all">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>GitHub</span>
+        </button>
+        <button type="button" class="flex items-center justify-center gap-2 py-2.5 border border-[#222] rounded-xl text-xs text-white hover:border-[#444] transition-all">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.067 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>
+          <span>Google</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="text-center text-xs text-[#555]">
+    &copy; 2026 Jarvis AI Trading Assistant. Encrypted SSL Workstation Connection.
+  </div>
+
+  <script>
+    function switchAuthTab(type) {
+      const tabSignIn = document.getElementById('tab-signin');
+      const tabSignUp = document.getElementById('tab-signup');
+      const formSignIn = document.getElementById('form-signin');
+      const formSignUp = document.getElementById('form-signup');
+
+      if (type === 'signin') {
+        tabSignIn.classList.add('border-white', 'text-white');
+        tabSignIn.classList.remove('border-transparent', 'text-[#777]');
+        tabSignUp.classList.add('border-transparent', 'text-[#777]');
+        tabSignUp.classList.remove('border-white', 'text-white');
+
+        formSignIn.classList.remove('hidden');
+        formSignUp.classList.add('hidden');
+      } else {
+        tabSignUp.classList.add('border-white', 'text-white');
+        tabSignUp.classList.remove('border-transparent', 'text-[#777]');
+        tabSignIn.classList.add('border-transparent', 'text-[#777]');
+        tabSignIn.classList.remove('border-white', 'text-white');
+
+        formSignUp.classList.remove('hidden');
+        formSignIn.classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
