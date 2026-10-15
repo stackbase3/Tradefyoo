@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: #050505;
+    color: #F5F5F5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: #F5F5F5;
+    color: #050505;
+  }
+}
+
+/* Glass panel effects matching the reference */
+.jarvis-panel {
+  background: rgba(12, 12, 12, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.jarvis-panel-glow {
+  box-shadow: 0 0 30px -10px rgba(255, 255, 255, 0.08);
+}
+
+/* Subtle border transitions */
+.hover-border-glow {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-border-glow:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 25px -5px rgba(255, 255, 255, 0.05);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+::-webkit-scrollbar-thumb {
+  background: #252525;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #383838;
+}
