@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jarvis — AI Trading Assistant</title>
   
-  <!-- Google Fonts -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   
-  <!-- Tailwind CSS via CDN (Bina kisi compile ke turant chalega) -->
+  <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -21,11 +21,11 @@
               bg: '#050505',
               surface: '#0A0A0A',
               card: '#0C0C0C',
-              border: '#252525',
-              borderLight: '#383838',
+              border: '#202020',
+              borderLight: '#333333',
               text: '#F5F5F5',
               muted: '#A3A3A3',
-              faint: '#666666'
+              faint: '#555555'
             }
           },
           fontFamily: {
@@ -45,30 +45,43 @@
       background-color: #050505;
       color: #F5F5F5;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
     .jarvis-panel {
-      background: rgba(12, 12, 12, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(12, 12, 12, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
-    .hover-border-glow {
-      transition: all 0.3s ease;
+    .hover-glow {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .hover-border-glow:hover {
-      border-color: rgba(255, 255, 255, 0.35);
-      box-shadow: 0 0 25px -5px rgba(255, 255, 255, 0.05);
+    .hover-glow:hover {
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px -10px rgba(255, 255, 255, 0.08);
     }
+    /* Waveform Animation for HUD */
+    @keyframes wave {
+      0%, 100% { height: 4px; }
+      50% { height: 18px; }
+    }
+    .waveform-bar {
+      animation: wave 1.2s ease-in-out infinite;
+    }
+    .waveform-bar:nth-child(2) { animation-delay: 0.15s; }
+    .waveform-bar:nth-child(3) { animation-delay: 0.3s; }
+    .waveform-bar:nth-child(4) { animation-delay: 0.45s; }
+    .waveform-bar:nth-child(5) { animation-delay: 0.6s; }
   </style>
 </head>
 <body class="bg-[#050505] text-[#F5F5F5] font-sans selection:bg-white selection:text-black">
 
-  <!-- ================= NAVIGATION ================= -->
-  <header id="main-nav" class="fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-[#050505]/90 border-b border-[#252525] backdrop-blur-md">
+  <!-- ================= 1. NAVIGATION ================= -->
+  <header class="fixed top-0 left-0 w-full z-50 bg-[#050505]/95 border-b border-[#202020] backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-      <!-- Logo -->
       <a href="#" class="flex items-center gap-3">
-        <svg class="w-7 h-7" viewBox="0 0 32 32" fill="none">
+        <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none">
           <circle cx="16" cy="16" r="14" stroke="#F5F5F5" stroke-width="1.5" stroke-dasharray="3 3"/>
           <polygon points="16,6 24,22 16,19 8,22" fill="#F5F5F5"/>
           <circle cx="16" cy="14" r="2" fill="#050505"/>
@@ -76,331 +89,413 @@
         <span class="font-semibold text-lg tracking-tight text-white">Jarvis</span>
       </a>
 
-      <!-- Links -->
       <nav class="hidden md:flex items-center gap-8 text-sm text-[#A3A3A3]">
         <a href="#features" class="hover:text-white transition-colors">Features</a>
         <a href="#experience" class="hover:text-white transition-colors">Experience</a>
-        <a href="#how-it-works" class="hover:text-white transition-colors">How It Works</a>
+        <a href="#workflow" class="hover:text-white transition-colors">Workflow</a>
         <a href="#performance" class="hover:text-white transition-colors">Performance</a>
-        <a href="#downloads" class="hover:text-white transition-colors">Downloads</a>
         <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
         <a href="#faq" class="hover:text-white transition-colors">FAQ</a>
       </nav>
 
-      <!-- Actions -->
-      <div class="hidden md:flex items-center gap-4">
-        <button onclick="openAuthModal()" class="text-sm font-medium text-[#A3A3A3] hover:text-white transition-colors px-3 py-2">
+      <div class="flex items-center gap-4">
+        <button onclick="toggleAuthModal(true)" class="hidden sm:block text-sm font-medium text-[#A3A3A3] hover:text-white transition-colors px-3 py-2">
           Sign In
         </button>
-        <a href="#pricing" class="inline-flex items-center gap-2 bg-white text-black text-sm font-medium px-4 py-2 rounded-full hover:bg-[#E5E5E5] transition-all">
-          <span>Get Jarvis</span>
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        <a href="#downloads" class="inline-flex items-center gap-2 bg-white text-black text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-[#E5E5E5] transition-all">
+          <span>Download</span>
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
         </a>
       </div>
     </div>
   </header>
 
-  <main>
-    <!-- ================= HERO SECTION ================= -->
-    <section class="relative min-h-screen pt-36 pb-20 flex items-center overflow-hidden">
-      <div class="max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <!-- Left Content -->
-        <div class="lg:col-span-6 z-10">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#252525] bg-[#0A0A0A] text-xs font-mono tracking-wider text-[#A3A3A3] mb-6">
-            <span>VOICE</span> &middot; <span>JOURNAL</span> &middot; <span>REFLECTION</span>
+  <!-- ================= 2. HERO SECTION ================= -->
+  <section class="relative pt-36 pb-20 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6">
+      
+      <!-- Top Headline Grid -->
+      <div class="max-w-3xl mb-12">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#252525] bg-[#0A0A0A] text-xs font-mono text-[#A3A3A3] mb-6">
+          <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+          <span>VOICE-FIRST TRADING INTELLIGENCE</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.05] mb-6">
+          Trade With Clarity.<br>
+          <span class="text-[#777777]">Let Jarvis Handle the Workflow.</span>
+        </h1>
+
+        <p class="text-base sm:text-lg text-[#A3A3A3] max-w-2xl font-normal leading-relaxed mb-8">
+          A dedicated desktop AI companion designed for active traders. Eliminate messy notes, speak trade observations in real-time, and automate your post-market debriefs.
+        </p>
+
+        <div class="flex flex-wrap items-center gap-4">
+          <a href="#downloads" class="inline-flex items-center gap-2.5 bg-white text-black font-semibold text-sm px-6 py-3.5 rounded-full hover:bg-[#E5E5E5] transition-all">
+            <span>Get Started Free</span>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </a>
+          <button onclick="openDemoModal()" class="inline-flex items-center gap-3 px-6 py-3.5 rounded-full border border-[#252525] bg-[#0A0A0A] hover:border-[#444] transition-all text-sm font-medium text-[#F5F5F5]">
+            <span class="w-6 h-6 rounded-full bg-[#1A1A1A] flex items-center justify-center">
+              <svg class="w-2.5 h-2.5 fill-current translate-x-0.5" viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+            </span>
+            <span>Watch Demo (1:24)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- VIDEO 1: High-Definition 16:9 Widescreen Container with Floating HUDs -->
+      <div class="relative w-full aspect-video max-h-[640px] rounded-2xl overflow-hidden border border-[#252525] bg-[#0A0A0A] shadow-2xl">
+        <!-- Native 16:9 Video (Crisp, zero crop, auto-mute safe) -->
+        <video autoplay muted loop playsinline class="w-full h-full object-cover">
+          <source src="./public/videos/jarvis-hero.mp4" type="video/mp4">
+        </video>
+
+        <!-- Subtle Gradient Edge Vignette (Non-destructive) -->
+        <div class="absolute inset-0 bg-gradient-to-t from-[#050505]/70 via-transparent to-transparent pointer-events-none"></div>
+
+        <!-- Floating HUD 1: Voice Waveform Transcript (Top Left) -->
+        <div class="absolute top-4 left-4 sm:top-8 sm:left-8 jarvis-panel rounded-xl p-4 max-w-[280px] sm:max-w-[340px] shadow-2xl">
+          <div class="flex items-center justify-between mb-2.5 border-b border-white/10 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+              <span class="text-[11px] font-mono tracking-wider text-white uppercase">Voice Capture Active</span>
+            </div>
+            <!-- Audio Waveform Visualizer -->
+            <div class="flex items-end gap-1 h-4">
+              <span class="w-1 bg-white/80 rounded-full waveform-bar"></span>
+              <span class="w-1 bg-white/80 rounded-full waveform-bar"></span>
+              <span class="w-1 bg-white/80 rounded-full waveform-bar"></span>
+              <span class="w-1 bg-white/80 rounded-full waveform-bar"></span>
+              <span class="w-1 bg-white/80 rounded-full waveform-bar"></span>
+            </div>
           </div>
-
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.08] mb-6">
-            Trade With Clarity.<br>
-            <span class="text-[#A3A3A3]">Let Jarvis Handle the Workflow.</span>
-          </h1>
-
-          <p class="text-base sm:text-lg text-[#A3A3A3] max-w-xl font-normal leading-relaxed mb-8">
-            Meet Jarvis, your dedicated desktop AI trading companion. Use natural voice control, maintain structured trading journals, and bring conscious discipline to your trading execution.
+          <p class="text-xs text-[#C5C5C5] font-mono leading-relaxed">
+            "Short 2 contracts NQ at 18,240. Setup: 15m order block rejection. Stop above 18,275."
           </p>
-
-          <div class="flex flex-wrap items-center gap-4 mb-6">
-            <a href="#pricing" class="inline-flex items-center gap-2 bg-white text-black font-medium text-sm px-6 py-3 rounded-full hover:bg-[#E5E5E5] transition-all">
-              <span>Get Jarvis</span>
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </a>
-            <button onclick="openDemoModal()" class="inline-flex items-center gap-3 px-5 py-3 rounded-full border border-[#252525] bg-[#0A0A0A] hover:border-[#383838] transition-all text-sm font-medium text-[#F5F5F5]">
-              <span class="w-6 h-6 rounded-full bg-[#181818] flex items-center justify-center">
-                <svg class="w-2.5 h-2.5 fill-current translate-x-0.5" viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
-              </span>
-              <span>Watch Demo (1:24)</span>
-            </button>
-          </div>
-
-          <div class="flex items-center gap-2 text-xs font-mono text-[#666666]">
-            <span class="w-1.5 h-1.5 rounded-full bg-white/60"></span>
-            <span>Available for Windows and macOS desktop</span>
-          </div>
-
-          <!-- Feature Pills -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-12 mt-12 border-t border-[#1C1C1C]">
-            <div class="flex items-center gap-2 text-xs text-[#A3A3A3]">
-              <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
-              <span>Voice Control</span>
-            </div>
-            <div class="flex items-center gap-2 text-xs text-[#A3A3A3]">
-              <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
-              <span>Auto Journal</span>
-            </div>
-            <div class="flex items-center gap-2 text-xs text-[#A3A3A3]">
-              <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/><path d="M3 12h18"/></svg>
-              <span>Trade Review</span>
-            </div>
-            <div class="flex items-center gap-2 text-xs text-[#A3A3A3]">
-              <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/></svg>
-              <span>Desktop App</span>
-            </div>
-          </div>
         </div>
 
-        <!-- Right Visual (Hero Video/HUD) -->
-        <div class="lg:col-span-6 relative flex items-center justify-center min-h-[440px]">
-          <div class="relative w-full max-w-[480px] aspect-square rounded-2xl overflow-hidden border border-[#252525] bg-[#0A0A0A] flex items-center justify-center shadow-2xl">
-            <!-- Video Player (Auto-Muted) -->
-            <video autoplay muted loop playsinline class="w-full h-full object-cover opacity-60">
-              <source src="./public/videos/jarvis-hero.mp4" type="video/mp4">
-            </video>
-
-            <!-- Holographic Center Orb -->
-            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div class="w-24 h-24 rounded-full border border-white/20 flex items-center justify-center animate-pulse bg-white/5">
-                <svg class="w-10 h-10" viewBox="0 0 32 32" fill="none">
-                  <polygon points="16,6 24,22 16,19 8,22" fill="#F5F5F5"/>
-                </svg>
-              </div>
+        <!-- Floating HUD 2: Automated Journal Badge (Bottom Right) -->
+        <div class="absolute bottom-4 right-4 sm:bottom-8 sm:right-8 jarvis-panel rounded-xl p-4 min-w-[240px] sm:min-w-[280px] shadow-2xl">
+          <div class="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
+            <span class="text-[11px] font-mono text-[#A3A3A3]">Trading Journal Sync</span>
+            <span class="text-[10px] font-mono text-black bg-white font-semibold px-2 py-0.5 rounded">Recorded</span>
+          </div>
+          <div class="space-y-2 text-xs font-mono">
+            <div class="flex justify-between text-[#888]">
+              <span>Symbol:</span>
+              <span class="text-white">NQ Futures</span>
             </div>
-
-            <!-- Floating Card 1 -->
-            <div class="absolute top-5 left-5 jarvis-panel rounded-xl p-3.5 max-w-[210px] z-10">
-              <div class="flex items-center gap-2 mb-1.5">
-                <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
-                <span class="text-[10px] font-mono tracking-wider text-white uppercase">Voice Session</span>
-              </div>
-              <p class="text-[11px] text-[#A3A3A3] leading-snug">"Jarvis, log a short trade on NQ at 18,240, stop above pivot."</p>
+            <div class="flex justify-between text-[#888]">
+              <span>Execution:</span>
+              <span class="text-white">18,240.00</span>
             </div>
-
-            <!-- Floating Card 2 -->
-            <div class="absolute bottom-5 right-5 jarvis-panel rounded-xl p-3.5 min-w-[210px] z-10">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-mono text-[#A3A3A3]">Workflow Status</span>
-                <span class="text-[9px] font-mono text-white bg-white/10 px-1.5 py-0.5 rounded">Active</span>
-              </div>
-              <div class="space-y-1 text-[11px] text-[#A3A3A3]">
-                <div class="flex items-center gap-1.5 text-white">✓ Audio transcribed</div>
-                <div class="flex items-center gap-1.5">✓ Journal updated</div>
-                <div class="flex items-center gap-1.5">✓ Risk logged</div>
-              </div>
+            <div class="flex justify-between text-[#888]">
+              <span>Risk/Reward:</span>
+              <span class="text-white">1 : 2.8</span>
             </div>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- ================= FEATURES GRID ================= -->
-    <section id="features" class="py-24 border-t border-[#1C1C1C]">
-      <div class="max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">
-          <div class="lg:col-span-5">
-            <span class="text-xs font-mono uppercase tracking-widest text-[#A3A3A3] mb-3 block">Dedicated Capabilities</span>
-            <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
-              Everything You Need in One Place
-            </h2>
-            <p class="text-[#A3A3A3] text-sm leading-relaxed mb-6">
-              Eliminate context switching and keep your focus locked on trade execution.
-            </p>
-            <a href="#downloads" class="inline-flex items-center gap-2 text-sm font-medium text-white hover:text-[#A3A3A3] transition-colors">
-              <span>Explore Desktop Applications</span>
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </a>
-          </div>
-
-          <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="bg-[#0C0C0C] border border-[#252525] p-6 rounded-2xl hover-border-glow">
-              <h3 class="text-base font-semibold text-white mb-2">Advanced Voice Control</h3>
-              <p class="text-xs text-[#A3A3A3] leading-relaxed">Interact naturally through voice and execute assistant actions without switching windows.</p>
-            </div>
-            <div class="bg-[#0C0C0C] border border-[#252525] p-6 rounded-2xl hover-border-glow">
-              <h3 class="text-base font-semibold text-white mb-2">Intelligent Trading Journal</h3>
-              <p class="text-xs text-[#A3A3A3] leading-relaxed">Standardize and maintain structured records of market observations automatically.</p>
-            </div>
-            <div class="bg-[#0C0C0C] border border-[#252525] p-6 rounded-2xl hover-border-glow">
-              <h3 class="text-base font-semibold text-white mb-2">AI Trade Review</h3>
-              <p class="text-xs text-[#A3A3A3] leading-relaxed">Reflect on past decisions, detect emotional biases, and identify bad trading habits.</p>
-            </div>
-            <div class="bg-[#0C0C0C] border border-[#252525] p-6 rounded-2xl hover-border-glow">
-              <h3 class="text-base font-semibold text-white mb-2">Dedicated Desktop App</h3>
-              <p class="text-xs text-[#A3A3A3] leading-relaxed">Ultra-low CPU usage and global hotkeys designed specifically for active workstations.</p>
-            </div>
-          </div>
+      <!-- Feature Badges Row -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-12 mt-6 border-t border-[#1C1C1C]">
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 text-white stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+          <span class="text-xs text-[#A3A3A3] font-medium">Real-Time Voice Logging</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 text-white stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
+          <span class="text-xs text-[#A3A3A3] font-medium">Automatic Tagging</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 text-white stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/><path d="M3 12h18"/></svg>
+          <span class="text-xs text-[#A3A3A3] font-medium">Unbiased AI Debrief</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 text-white stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/></svg>
+          <span class="text-xs text-[#A3A3A3] font-medium">Zero Chart Overhead</span>
         </div>
       </div>
-    </section>
 
-    <!-- ================= PERFORMANCE 3D WIREFRAME ================= -->
-    <section id="performance" class="py-24 border-t border-[#1C1C1C] bg-[#050505]">
-      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <!-- Three.js Canvas Container -->
-        <div class="lg:col-span-6 h-[340px] border border-[#252525] rounded-2xl overflow-hidden bg-[#0A0A0A] relative">
-          <div id="three-wireframe-container" class="w-full h-full"></div>
-          <div class="absolute bottom-3 left-4 text-[11px] font-mono text-[#666666]">
-            Procedural 3D Mesh Engine
-          </div>
-        </div>
+    </div>
+  </section>
 
-        <div class="lg:col-span-6">
-          <span class="text-xs font-mono uppercase tracking-widest text-[#A3A3A3] mb-3 block">High Performance</span>
+  <!-- ================= 3. FEATURE ARCHITECTURE ================= -->
+  <section id="features" class="py-24 border-t border-[#1C1C1C]">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-16">
+        <div class="lg:col-span-5">
+          <span class="text-xs font-mono uppercase tracking-widest text-[#777777] mb-3 block">Engineered For Focus</span>
           <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
-            Zero Latency. Minimal Footprint.
+            Everything You Need.<br>Nothing You Don't.
           </h2>
-          <p class="text-sm text-[#A3A3A3] leading-relaxed mb-6">
-            Jarvis is engineered to operate silently in the background, preserving 100% of your system's rendering performance for your trading execution platforms.
+          <p class="text-[#A3A3A3] text-sm leading-relaxed mb-6">
+            Most trading journals force you to type paragraphs in spreadsheets while the market moves. Jarvis sits quietly in the tray, captures your verbal thought process instantly, and structures it into actionable performance analytics.
           </p>
-          <div class="grid grid-cols-3 gap-6 pt-6 border-t border-[#252525]">
-            <div>
-              <span class="text-2xl font-bold text-white font-mono block">&lt; 50ms</span>
-              <span class="text-xs text-[#A3A3A3]">Voice latency</span>
-            </div>
-            <div>
-              <span class="text-2xl font-bold text-white font-mono block">Native</span>
-              <span class="text-xs text-[#A3A3A3]">C++ / Rust Core</span>
-            </div>
-            <div>
-              <span class="text-2xl font-bold text-white font-mono block">0.2%</span>
-              <span class="text-xs text-[#A3A3A3]">Idle CPU load</span>
-            </div>
+        </div>
+
+        <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-[#0C0C0C] border border-[#202020] p-6 rounded-2xl hover-glow">
+            <h3 class="text-sm font-semibold text-white mb-2 font-mono">01 / Instant Voice Hotkey</h3>
+            <p class="text-xs text-[#A3A3A3] leading-relaxed">
+              Press a single global key combo. Speak your setup, thesis, and emotions. Jarvis transcribes and structures the entry in milliseconds.
+            </p>
+          </div>
+          <div class="bg-[#0C0C0C] border border-[#202020] p-6 rounded-2xl hover-glow">
+            <h3 class="text-sm font-semibold text-white mb-2 font-mono">02 / Structured Database</h3>
+            <p class="text-xs text-[#A3A3A3] leading-relaxed">
+              Automatically parses symbols, entry prices, stop losses, and setups into clean, searchable, and exportable journal records.
+            </p>
+          </div>
+          <div class="bg-[#0C0C0C] border border-[#202020] p-6 rounded-2xl hover-glow">
+            <h3 class="text-sm font-semibold text-white mb-2 font-mono">03 / Objective AI Debrief</h3>
+            <p class="text-xs text-[#A3A3A3] leading-relaxed">
+              Review your trading day with an AI that doesn't care about your feelings—highlighting revenge trades, oversized risk, and rule breaks.
+            </p>
+          </div>
+          <div class="bg-[#0C0C0C] border border-[#202020] p-6 rounded-2xl hover-glow">
+            <h3 class="text-sm font-semibold text-white mb-2 font-mono">04 / Native Performance</h3>
+            <p class="text-xs text-[#A3A3A3] leading-relaxed">
+              Lightweight compiled desktop app. It will never lag your NinjaTrader, TradingView, or broker execution engines.
+            </p>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ================= DOWNLOADS ================= -->
-    <section id="downloads" class="py-24 border-t border-[#1C1C1C]">
-      <div class="max-w-7xl mx-auto px-6 text-center">
-        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">Get Jarvis for Your Desktop</h2>
-        <p class="text-sm text-[#A3A3A3] max-w-lg mx-auto mb-12">Universal installer package optimized for Apple Silicon and modern 64-bit Windows systems.</p>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-          <!-- Windows -->
-          <div class="bg-[#0C0C0C] border border-[#252525] p-8 rounded-2xl hover-border-glow text-left flex flex-col justify-between">
-            <div>
-              <div class="w-10 h-10 rounded-lg bg-[#141414] border border-[#252525] flex items-center justify-center mb-4">
-                <svg class="w-5 h-5 fill-current text-white" viewBox="0 0 32 32"><path d="M2.5 5.2L13.8 3.6V14.8H2.5V5.2ZM13.8 16.8V28.4L2.5 26.8V16.8H13.8ZM15.8 3.3L29.5 1.3V14.8H15.8V3.3ZM29.5 16.8V30.7L15.8 28.7V16.8H29.5Z"/></svg>
-              </div>
-              <h3 class="text-lg font-semibold text-white mb-1">Windows</h3>
-              <p class="text-xs text-[#A3A3A3] mb-6">Windows 10 / 11 (64-bit)</p>
-            </div>
-            <a href="#" class="w-full text-center bg-white text-black text-xs font-semibold py-3 rounded-xl hover:bg-[#E5E5E5] transition-all">Download (.exe)</a>
+  <!-- ================= 4. VIDEO 2: CINEMATIC FULL-WIDTH EXPERIENCE ================= -->
+  <section id="experience" class="relative py-32 border-t border-[#1C1C1C] overflow-hidden bg-[#0A0A0A]">
+    <!-- Crisp 16:9 Cinematic Video Background -->
+    <div class="absolute inset-0 z-0">
+      <video autoplay muted loop playsinline class="w-full h-full object-cover opacity-60">
+        <source src="./public/videos/jarvis-cinematic.mp4" type="video/mp4">
+      </video>
+      <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-[#050505]"></div>
+    </div>
+
+    <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+      <span class="text-xs font-mono uppercase tracking-widest text-[#A3A3A3] mb-4 inline-block">The Experience</span>
+      <h2 class="text-4xl sm:text-5xl font-bold tracking-tight text-white mb-6">
+        Think Clearly. Trade Deliberately.
+      </h2>
+      <p class="text-base sm:text-lg text-[#A3A3A3] leading-relaxed mb-8 max-w-2xl mx-auto">
+        When the market is moving fast, typing distracts you. Speak your strategy, let Jarvis organize your session, and focus on clean execution.
+      </p>
+      <button onclick="openDemoModal()" class="inline-flex items-center gap-3 bg-white text-black px-7 py-3.5 rounded-full font-semibold text-sm hover:bg-[#E5E5E5] transition-all">
+        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+        <span>Watch Workflow Video</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ================= 5. PERFORMANCE & THREE.JS ENGINE ================= -->
+  <section id="performance" class="py-24 border-t border-[#1C1C1C]">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      
+      <!-- Crisp Retina Three.js Canvas -->
+      <div class="lg:col-span-6 h-[400px] border border-[#252525] rounded-2xl overflow-hidden bg-[#050505] relative shadow-2xl">
+        <div id="three-wireframe-container" class="w-full h-full"></div>
+        <div class="absolute bottom-4 left-5 flex items-center gap-2 text-[11px] font-mono text-[#888]">
+          <span class="w-2 h-2 rounded-full bg-emerald-400/80"></span>
+          <span>Procedural 3D Mesh &bull; 60 FPS Native</span>
+        </div>
+      </div>
+
+      <div class="lg:col-span-6">
+        <span class="text-xs font-mono uppercase tracking-widest text-[#777777] mb-3 block">Under The Hood</span>
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
+          Built For Speed. Designed For Zero Lag.
+        </h2>
+        <p class="text-sm text-[#A3A3A3] leading-relaxed mb-8">
+          Trading requires microsecond focus. Jarvis stays dormant in system memory until your hotkey is summoned, processing speech with dedicated hardware encoders.
+        </p>
+
+        <div class="grid grid-cols-3 gap-6 pt-6 border-t border-[#202020]">
+          <div>
+            <span class="text-2xl sm:text-3xl font-bold text-white font-mono block">&lt; 35ms</span>
+            <span class="text-xs text-[#777]">Hotkey Response</span>
           </div>
-
-          <!-- Mac -->
-          <div class="bg-[#0C0C0C] border border-[#252525] p-8 rounded-2xl hover-border-glow text-left flex flex-col justify-between">
-            <div>
-              <div class="w-10 h-10 rounded-lg bg-[#141414] border border-[#252525] flex items-center justify-center mb-4">
-                <svg class="w-5 h-5 fill-current text-white" viewBox="0 0 32 32"><path d="M20.5 4.5C21.6 3.1 22.4 1.2 22.2 0C20.6 0.1 18.7 1.1 17.6 2.4C16.6 3.6 15.7 5.5 16 6.7C17.8 6.8 19.5 5.8 20.5 4.5ZM24.6 13.9C24.5 10.3 27.5 8.5 27.6 8.4C25.9 5.9 23.3 5.6 22.4 5.5C20.2 5.3 18 6.9 16.9 6.9C15.7 6.9 13.9 5.5 12.2 5.5C10 5.5 7.9 6.8 6.8 8.7C4.5 12.7 6.2 18.7 8.4 21.9C9.5 23.5 10.8 25.2 12.5 25.1C14.2 25 14.8 24 16.9 24C18.9 24 19.5 25.1 21.3 25.1C23.1 25.1 24.2 23.6 25.3 22C26.6 20.1 27.1 18.3 27.2 18.2C27.1 18.1 24.6 17.1 24.6 13.9Z"/></svg>
-              </div>
-              <h3 class="text-lg font-semibold text-white mb-1">macOS</h3>
-              <p class="text-xs text-[#A3A3A3] mb-6">Apple Silicon & Intel</p>
-            </div>
-            <a href="#" class="w-full text-center bg-white text-black text-xs font-semibold py-3 rounded-xl hover:bg-[#E5E5E5] transition-all">Download (.dmg)</a>
+          <div>
+            <span class="text-2xl sm:text-3xl font-bold text-white font-mono block">~0.1%</span>
+            <span class="text-xs text-[#777]">Standby CPU</span>
+          </div>
+          <div>
+            <span class="text-2xl sm:text-3xl font-bold text-white font-mono block">Zero</span>
+            <span class="text-xs text-[#777]">Chart Interruption</span>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- ================= PRICING ================= -->
-    <section id="pricing" class="py-24 border-t border-[#1C1C1C]">
-      <div class="max-w-7xl mx-auto px-6 text-center">
-        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">Choose Your Plan</h2>
-        <p class="text-sm text-[#A3A3A3] mb-12">Access Jarvis through your account on all supported devices.</p>
+    </div>
+  </section>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto mb-10 text-left">
-          <!-- Monthly -->
-          <div class="bg-[#0C0C0C] border border-[#252525] p-8 rounded-2xl flex flex-col justify-between">
-            <div>
-              <span class="text-xs font-mono text-[#A3A3A3] block mb-2">Monthly</span>
-              <div class="flex items-baseline gap-2 mb-4">
-                <span class="text-4xl font-bold text-white font-mono">$12</span>
-                <span class="text-xs text-[#A3A3A3]">/ month</span>
-              </div>
-              <p class="text-xs text-[#A3A3A3] mb-6">Standard desktop usage with automated trade logging.</p>
+  <!-- ================= 6. UNIFIED SINGLE-LINE DOWNLOAD DOCK ================= -->
+  <!-- Note: No clunky .exe / .dmg files displayed! Just modern, clean download pills -->
+  <section id="downloads" class="py-24 border-t border-[#1C1C1C]">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <span class="text-xs font-mono uppercase tracking-widest text-[#777777] mb-3 block">Desktop Application</span>
+      <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">Available on Windows & macOS</h2>
+      <p class="text-sm text-[#A3A3A3] mb-10 max-w-lg mx-auto">
+        Install Jarvis directly onto your trading workstation. Universal binary optimized for Apple Silicon (M-Series), Intel, and Windows 10/11.
+      </p>
+
+      <!-- Sleek Single-Line Download Dock -->
+      <div class="inline-flex flex-col sm:flex-row items-center gap-4 p-2 bg-[#0C0C0C] border border-[#252525] rounded-2xl shadow-2xl">
+        <!-- Windows Download Button -->
+        <a href="#downloads" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-[#161616] hover:bg-white hover:text-black text-white px-6 py-3.5 rounded-xl text-sm font-semibold transition-all">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 32 32"><path d="M2.5 5.2L13.8 3.6V14.8H2.5V5.2ZM13.8 16.8V28.4L2.5 26.8V16.8H13.8ZM15.8 3.3L29.5 1.3V14.8H15.8V3.3ZM29.5 16.8V30.7L15.8 28.7V16.8H29.5Z"/></svg>
+          <span>Download for Windows</span>
+        </a>
+
+        <!-- macOS Download Button -->
+        <a href="#downloads" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-[#161616] hover:bg-white hover:text-black text-white px-6 py-3.5 rounded-xl text-sm font-semibold transition-all">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 32 32"><path d="M20.5 4.5C21.6 3.1 22.4 1.2 22.2 0C20.6 0.1 18.7 1.1 17.6 2.4C16.6 3.6 15.7 5.5 16 6.7C17.8 6.8 19.5 5.8 20.5 4.5ZM24.6 13.9C24.5 10.3 27.5 8.5 27.6 8.4C25.9 5.9 23.3 5.6 22.4 5.5C20.2 5.3 18 6.9 16.9 6.9C15.7 6.9 13.9 5.5 12.2 5.5C10 5.5 7.9 6.8 6.8 8.7C4.5 12.7 6.2 18.7 8.4 21.9C9.5 23.5 10.8 25.2 12.5 25.1C14.2 25 14.8 24 16.9 24C18.9 24 19.5 25.1 21.3 25.1C23.1 25.1 24.2 23.6 25.3 22C26.6 20.1 27.1 18.3 27.2 18.2C27.1 18.1 24.6 17.1 24.6 13.9Z"/></svg>
+          <span>Download for Mac</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 7. PRICING ================= -->
+  <section id="pricing" class="py-24 border-t border-[#1C1C1C]">
+    <div class="max-w-7xl mx-auto px-6 text-center">
+      <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">Transparent Pricing</h2>
+      <p class="text-sm text-[#A3A3A3] mb-12">One account for all your desktop setups.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto mb-10 text-left">
+        <!-- Monthly -->
+        <div class="bg-[#0C0C0C] border border-[#202020] p-8 rounded-2xl flex flex-col justify-between hover-glow">
+          <div>
+            <span class="text-xs font-mono text-[#A3A3A3] block mb-2">MONTHLY PLAN</span>
+            <div class="flex items-baseline gap-2 mb-4">
+              <span class="text-4xl font-bold text-white font-mono">$12</span>
+              <span class="text-xs text-[#A3A3A3]">/ month</span>
             </div>
-            <button class="w-full border border-[#252525] text-white py-2.5 rounded-xl text-xs font-medium hover:border-white transition-all">Select Monthly</button>
+            <p class="text-xs text-[#A3A3A3] leading-relaxed mb-6">Full desktop app access with standard monthly AI token allowance.</p>
           </div>
+          <button class="w-full border border-[#333] text-white py-3 rounded-xl text-xs font-semibold hover:border-white transition-all">Start Monthly</button>
+        </div>
 
-          <!-- Annual -->
-          <div class="bg-[#0C0C0C] border border-white/50 p-8 rounded-2xl flex flex-col justify-between relative shadow-2xl">
-            <span class="absolute -top-3 right-6 bg-white text-black text-[10px] font-mono px-3 py-0.5 rounded-full font-bold uppercase">Popular</span>
-            <div>
-              <span class="text-xs font-mono text-[#A3A3A3] block mb-2">Annual</span>
-              <div class="flex items-baseline gap-2 mb-4">
-                <span class="text-4xl font-bold text-white font-mono">$133</span>
-                <span class="text-xs text-[#A3A3A3]">/ year</span>
-              </div>
-              <p class="text-xs text-[#A3A3A3] mb-6">Billed annually (~$11.08/mo). Full desktop access.</p>
+        <!-- Annual -->
+        <div class="bg-[#0C0C0C] border border-white/60 p-8 rounded-2xl flex flex-col justify-between relative shadow-2xl hover-glow">
+          <span class="absolute -top-3 right-6 bg-white text-black text-[10px] font-mono px-3 py-0.5 rounded-full font-bold uppercase">Save 15%</span>
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs font-mono text-[#A3A3A3]">ANNUAL PLAN</span>
+              <span class="text-[11px] font-mono text-white/80">~$11.08 / mo</span>
             </div>
-            <button class="w-full bg-white text-black py-2.5 rounded-xl text-xs font-semibold hover:bg-[#E5E5E5] transition-all">Select Annual</button>
+            <div class="flex items-baseline gap-2 mb-4">
+              <span class="text-4xl font-bold text-white font-mono">$133</span>
+              <span class="text-xs text-[#A3A3A3]">/ year</span>
+            </div>
+            <p class="text-xs text-[#A3A3A3] leading-relaxed mb-6">Billed annually. Includes all desktop updates and priority AI token generation.</p>
+          </div>
+          <button class="w-full bg-white text-black py-3 rounded-xl text-xs font-bold hover:bg-[#E5E5E5] transition-all">Get Annual Plan</button>
+        </div>
+      </div>
+
+      <p class="text-xs text-[#666]">Need more AI usage? Top up your token balance whenever additional usage is needed.</p>
+    </div>
+  </section>
+
+  <!-- ================= 8. FAQ ACCORDION ================= -->
+  <section id="faq" class="py-24 border-t border-[#1C1C1C]">
+    <div class="max-w-3xl mx-auto px-6">
+      <h2 class="text-3xl font-bold tracking-tight text-white text-center mb-12">Frequently Asked Questions</h2>
+      
+      <div class="space-y-3">
+        <div class="border border-[#202020] rounded-xl overflow-hidden bg-[#0A0A0A]">
+          <button onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex justify-between items-center text-sm font-medium text-white">
+            <span>What is Jarvis?</span>
+            <span class="text-lg leading-none">+</span>
+          </button>
+          <div class="hidden px-6 pb-4 text-xs text-[#A3A3A3] leading-relaxed border-t border-[#1C1C1C] pt-3">
+            Jarvis is a dedicated desktop AI companion built exclusively for active traders. It streamlines trading workflow management through natural voice commands, automated journaling, and unbiased trade reflection.
           </div>
         </div>
 
-        <p class="text-xs text-[#666666]">Need more AI usage? Top up your token balance whenever additional usage is needed.</p>
-      </div>
-    </section>
-
-    <!-- ================= FAQ ================= -->
-    <section id="faq" class="py-24 border-t border-[#1C1C1C]">
-      <div class="max-w-3xl mx-auto px-6">
-        <h2 class="text-3xl font-bold tracking-tight text-white text-center mb-12">Frequently Asked Questions</h2>
-        <div class="space-y-3">
-          <div class="border border-[#252525] rounded-xl overflow-hidden bg-[#0A0A0A]">
-            <button onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex justify-between items-center text-sm font-medium text-white">
-              <span>What is Jarvis?</span>
-              <span class="text-lg leading-none">+</span>
-            </button>
-            <div class="hidden px-6 pb-4 text-xs text-[#A3A3A3] leading-relaxed border-t border-[#1C1C1C] pt-3">
-              Jarvis is a dedicated desktop AI companion built exclusively for active traders to automate voice journaling and trade review.
-            </div>
+        <div class="border border-[#202020] rounded-xl overflow-hidden bg-[#0A0A0A]">
+          <button onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex justify-between items-center text-sm font-medium text-white">
+            <span>Is Jarvis an automated trading bot?</span>
+            <span class="text-lg leading-none">+</span>
+          </button>
+          <div class="hidden px-6 pb-4 text-xs text-[#A3A3A3] leading-relaxed border-t border-[#1C1C1C] pt-3">
+            No. Jarvis does not place market orders or trade capital on your behalf. It is an analytical workflow assistant to help you record, journal, and reflect on your own trades.
           </div>
+        </div>
 
-          <div class="border border-[#252525] rounded-xl overflow-hidden bg-[#0A0A0A]">
-            <button onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex justify-between items-center text-sm font-medium text-white">
-              <span>Is Jarvis an automated trading bot?</span>
-              <span class="text-lg leading-none">+</span>
-            </button>
-            <div class="hidden px-6 pb-4 text-xs text-[#A3A3A3] leading-relaxed border-t border-[#1C1C1C] pt-3">
-              No. Jarvis is an assistant and workflow companion. It does not place unsolicited market orders or execute black-box algorithms.
-            </div>
+        <div class="border border-[#202020] rounded-xl overflow-hidden bg-[#0A0A0A]">
+          <button onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex justify-between items-center text-sm font-medium text-white">
+            <span>How do AI tokens work?</span>
+            <span class="text-lg leading-none">+</span>
+          </button>
+          <div class="hidden px-6 pb-4 text-xs text-[#A3A3A3] leading-relaxed border-t border-[#1C1C1C] pt-3">
+            Audio transcriptions and post-market reviews consume credits from your token pool. Both subscriptions include an ample baseline quota, and extra top-ups can be added anytime.
           </div>
         </div>
       </div>
-    </section>
-  </main>
+    </div>
+  </section>
 
-  <!-- ================= FOOTER ================= -->
-  <footer class="border-t border-[#1C1C1C] py-12 bg-[#050505] text-center text-xs text-[#666666]">
-    <p>&copy; 2026 Jarvis AI Trading Assistant. All rights reserved.</p>
+  <!-- ================= 9. FOOTER ================= -->
+  <footer class="border-t border-[#1C1C1C] py-12 bg-[#050505] text-center text-xs text-[#555]">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <span>&copy; 2026 Jarvis AI Trading Assistant. All rights reserved.</span>
+      <span class="text-[#444]">Not Financial Advice &bull; For Workflow Productivity</span>
+    </div>
   </footer>
 
-  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <!-- ================= VIDEO 3: WALKTHROUGH MODAL ================= -->
+  <div id="demo-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/95 p-4 backdrop-blur-md">
+    <div class="relative w-full max-w-4xl aspect-video bg-[#0C0C0C] border border-[#252525] rounded-2xl overflow-hidden shadow-2xl">
+      <button onclick="closeDemoModal()" class="absolute top-4 right-4 text-white z-20 bg-black/70 hover:bg-white hover:text-black transition-colors p-2 rounded-full">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+      <video id="modal-video-player" controls playsinline class="w-full h-full object-cover">
+        <source src="./public/videos/jarvis-ambient.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <!-- ================= SCRIPT: RETINA THREE.JS + AUDIO GUARD ================= -->
   <script>
-    // 1. ABSOLUTE AUDIO MUTE GUARD (Kisi bhi video ka music sunai nahi dega)
-    document.querySelectorAll('video').forEach(video => {
-      video.muted = true;
-      video.defaultMuted = true;
-      video.volume = 0;
-      video.addEventListener('volumechange', () => {
-        if (!video.muted || video.volume > 0) {
+    // 1. ABSOLUTE AUDIO GUARD (Never let video music blast)
+    function enforceAudioMute() {
+      document.querySelectorAll('video').forEach(video => {
+        if (video.id !== 'modal-video-player') {
           video.muted = true;
+          video.defaultMuted = true;
           video.volume = 0;
+          video.addEventListener('volumechange', () => {
+            if (!video.muted || video.volume > 0) {
+              video.muted = true;
+              video.volume = 0;
+            }
+          });
         }
       });
-    });
+    }
+    enforceAudioMute();
 
-    // 2. FAQ Accordion Toggle
+    // 2. MODAL CONTROLS
+    function openDemoModal() {
+      const modal = document.getElementById('demo-modal');
+      const player = document.getElementById('modal-video-player');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      if (player) player.play();
+    }
+    function closeDemoModal() {
+      const modal = document.getElementById('demo-modal');
+      const player = document.getElementById('modal-video-player');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      if (player) player.pause();
+    }
+
+    // 3. FAQ ACCORDION
     function toggleFaq(btn) {
       const content = btn.nextElementSibling;
       const icon = btn.querySelector('span:last-child');
@@ -409,48 +504,76 @@
       icon.textContent = isHidden ? '−' : '+';
     }
 
-    // 3. Three.js 3D Wireframe Scene Initialization
-    function init3DWireframe() {
+    // 4. RETINA-SHARP THREE.JS WIREFRAME SCENE
+    function initCrispThreeScene() {
       const container = document.getElementById('three-wireframe-container');
       if (!container || typeof THREE === 'undefined') return;
 
       const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x050505);
+
       const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
-      camera.position.set(0, 5, 10);
+      camera.position.set(0, 5, 11);
       camera.lookAt(0, 0, 0);
 
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
       renderer.setSize(container.clientWidth, container.clientHeight);
+      // RETINA FIX: Sets resolution to match high-density mobile screens without blur!
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.5));
       container.appendChild(renderer.domElement);
 
-      // Wireframe Plane
-      const geom = new THREE.PlaneGeometry(16, 16, 28, 28);
-      geom.rotateX(-Math.PI / 2);
-      const pos = geom.attributes.position;
+      // High-Density Procedural Wave Landscape (60x60 grid)
+      const planeGeom = new THREE.PlaneGeometry(18, 18, 55, 55);
+      planeGeom.rotateX(-Math.PI / 2);
+      const pos = planeGeom.attributes.position;
       for (let i = 0; i < pos.count; i++) {
         const x = pos.getX(i);
         const z = pos.getZ(i);
-        pos.setY(i, Math.sin(x * 0.5) * Math.cos(z * 0.5) * 1.2);
+        const y = Math.sin(x * 0.45) * Math.cos(z * 0.45) * 1.4 + Math.sin(z * 0.3) * 0.5;
+        pos.setY(i, y);
       }
-      geom.computeVertexNormals();
+      planeGeom.computeVertexNormals();
 
-      const mat = new THREE.MeshBasicMaterial({ color: 0x444444, wireframe: true });
-      const mesh = new THREE.Mesh(geom, mat);
-      scene.add(mesh);
+      const wireMaterial = new THREE.MeshBasicMaterial({
+        color: 0x444444,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.5
+      });
+      const terrain = new THREE.Mesh(planeGeom, wireMaterial);
+      scene.add(terrain);
 
-      // Floating Orb
-      const sphereGeom = new THREE.SphereGeometry(0.8, 24, 24);
-      const sphereMat = new THREE.MeshBasicMaterial({ color: 0x888888, wireframe: true });
-      const sphere = new THREE.Mesh(sphereGeom, sphereMat);
-      sphere.position.set(0, 2, 0);
-      scene.add(sphere);
+      // Realistic Chrome Shaded Spheres (Floating above wave)
+      const sphereMat = new THREE.MeshStandardMaterial({
+        color: 0x222222,
+        metalness: 0.95,
+        roughness: 0.1
+      });
 
+      const orb1 = new THREE.Mesh(new THREE.SphereGeometry(0.75, 32, 32), sphereMat);
+      orb1.position.set(-2, 2.8, 1);
+      scene.add(orb1);
+
+      const orb2 = new THREE.Mesh(new THREE.SphereGeometry(0.45, 32, 32), sphereMat);
+      orb2.position.set(2.5, 1.8, 2);
+      scene.add(orb2);
+
+      // Lighting for realistic 3D reflection
+      const ambLight = new THREE.AmbientLight(0xffffff, 0.8);
+      scene.add(ambLight);
+
+      const dirLight = new THREE.DirectionalLight(0xffffff, 3.0);
+      dirLight.position.set(5, 12, 8);
+      scene.add(dirLight);
+
+      // Smooth Animation Loop
       let clock = new THREE.Clock();
       function animate() {
         requestAnimationFrame(animate);
         const t = clock.getElapsedTime();
-        sphere.position.y = 2 + Math.sin(t * 1.5) * 0.3;
-        mesh.rotation.y = Math.sin(t * 0.2) * 0.05;
+        orb1.position.y = 2.8 + Math.sin(t * 1.4) * 0.25;
+        orb2.position.y = 1.8 + Math.cos(t * 1.6) * 0.2;
+        terrain.rotation.y = Math.sin(t * 0.1) * 0.04;
         renderer.render(scene, camera);
       }
       animate();
@@ -462,7 +585,7 @@
       });
     }
 
-    window.addEventListener('DOMContentLoaded', init3DWireframe);
+    window.addEventListener('DOMContentLoaded', initCrispThreeScene);
   </script>
 </body>
 </html>
