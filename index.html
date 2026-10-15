@@ -3,29 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jarvis — Personal AI Trading Assistant</title>
-  <meta name="description" content="Jarvis is a dedicated desktop AI companion for traders. Utilize natural voice interaction, structured trading journals, and AI trade review. Available for Windows and macOS.">
-  <meta property="og:title" content="Jarvis — AI Trading Assistant">
-  <meta property="og:description" content="Trade With Clarity. Let Jarvis Handle the Workflow. Desktop AI assistant for disciplined traders.">
-  <meta property="og:type" content="website">
-  <link rel="icon" type="image/svg+xml" href="/public/icons/jarvis-logo.svg">
+  <title>Jarvis — AI Trading Assistant</title>
+  
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/src/css/input.css">
-</head>
-<body class="bg-[#050505] text-[#F5F5F5] font-sans antialiased selection:bg-white selection:text-black">
+  
+  <!-- Tailwind CSS via CDN (Bina kisi compile ke turant chalega) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            jarvis: {
+              bg: '#050505',
+              surface: '#0A0A0A',
+              card: '#0C0C0C',
+              border: '#252525',
+              borderLight: '#383838',
+              text: '#F5F5F5',
+              muted: '#A3A3A3',
+              faint: '#666666'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
 
-  <!-- ================= SECTION 1: NAVIGATION ================= -->
-  <header id="main-nav" class="fixed top-0 left-0 w-full z-50 transition-all duration-300">
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    body {
+      background-color: #050505;
+      color: #F5F5F5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .jarvis-panel {
+      background: rgba(12, 12, 12, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .hover-border-glow {
+      transition: all 0.3s ease;
+    }
+    .hover-border-glow:hover {
+      border-color: rgba(255, 255, 255, 0.35);
+      box-shadow: 0 0 25px -5px rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+<body class="bg-[#050505] text-[#F5F5F5] font-sans selection:bg-white selection:text-black">
+
+  <!-- ================= NAVIGATION ================= -->
+  <header id="main-nav" class="fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-[#050505]/90 border-b border-[#252525] backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-      <!-- Left: Brand -->
-      <a href="#" class="flex items-center gap-3 group focus:outline-none focus:ring-1 focus:ring-white">
-        <img src="/public/icons/jarvis-logo.svg" alt="Jarvis Logo" class="w-7 h-7 transition-transform group-hover:scale-105">
-        <span class="font-semibold text-lg tracking-tight text-[#F5F5F5]">Jarvis</span>
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-3">
+        <svg class="w-7 h-7" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="14" stroke="#F5F5F5" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <polygon points="16,6 24,22 16,19 8,22" fill="#F5F5F5"/>
+          <circle cx="16" cy="14" r="2" fill="#050505"/>
+        </svg>
+        <span class="font-semibold text-lg tracking-tight text-white">Jarvis</span>
       </a>
 
-      <!-- Center: Links -->
+      <!-- Links -->
       <nav class="hidden md:flex items-center gap-8 text-sm text-[#A3A3A3]">
         <a href="#features" class="hover:text-white transition-colors">Features</a>
         <a href="#experience" class="hover:text-white transition-colors">Experience</a>
@@ -36,50 +87,24 @@
         <a href="#faq" class="hover:text-white transition-colors">FAQ</a>
       </nav>
 
-      <!-- Right: Action Buttons -->
+      <!-- Actions -->
       <div class="hidden md:flex items-center gap-4">
-        <button data-auth-trigger="signin" class="text-sm font-medium text-[#A3A3A3] hover:text-white transition-colors px-3 py-2">
+        <button onclick="openAuthModal()" class="text-sm font-medium text-[#A3A3A3] hover:text-white transition-colors px-3 py-2">
           Sign In
         </button>
-        <a href="#pricing" class="inline-flex items-center gap-2 bg-white text-[#050505] text-sm font-medium px-4 py-2 rounded-full hover:bg-[#E5E5E5] transition-all">
+        <a href="#pricing" class="inline-flex items-center gap-2 bg-white text-black text-sm font-medium px-4 py-2 rounded-full hover:bg-[#E5E5E5] transition-all">
           <span>Get Jarvis</span>
-          <img src="/public/icons/icon-arrow.svg" alt="" class="w-3.5 h-3.5">
-        </a>
-      </div>
-
-      <!-- Mobile Hamburger Button -->
-      <button id="mobile-menu-toggle" aria-label="Toggle Navigation" aria-expanded="false" class="md:hidden p-2 text-[#A3A3A3] hover:text-white">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </button>
-    </div>
-
-    <!-- Mobile Menu Flyout -->
-    <div id="mobile-menu" class="hidden md:hidden bg-[#0A0A0A] border-b border-[#252525] px-6 py-6 space-y-4">
-      <nav class="flex flex-col space-y-3 text-sm text-[#A3A3A3]">
-        <a href="#features" class="hover:text-white">Features</a>
-        <a href="#experience" class="hover:text-white">Experience</a>
-        <a href="#how-it-works" class="hover:text-white">How It Works</a>
-        <a href="#performance" class="hover:text-white">Performance</a>
-        <a href="#downloads" class="hover:text-white">Downloads</a>
-        <a href="#pricing" class="hover:text-white">Pricing</a>
-        <a href="#faq" class="hover:text-white">FAQ</a>
-      </nav>
-      <div class="pt-4 border-t border-[#252525] flex flex-col gap-3">
-        <button data-auth-trigger="signin" class="w-full text-center text-sm font-medium text-white py-2 border border-[#252525] rounded-full">
-          Sign In
-        </button>
-        <a href="#pricing" class="w-full text-center text-sm font-medium bg-white text-black py-2 rounded-full">
-          Get Jarvis
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
         </a>
       </div>
     </div>
   </header>
 
   <main>
-    <!-- ================= SECTION 2: HERO ================= -->
-    <section class="relative min-h-screen pt-32 pb-20 flex items-center overflow-hidden">
+    <!-- ================= HERO SECTION ================= -->
+    <section class="relative min-h-screen pt-36 pb-20 flex items-center overflow-hidden">
       <div class="max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <!-- Hero Left Column -->
+        <!-- Left Content -->
         <div class="lg:col-span-6 z-10">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#252525] bg-[#0A0A0A] text-xs font-mono tracking-wider text-[#A3A3A3] mb-6">
             <span>VOICE</span> &middot; <span>JOURNAL</span> &middot; <span>REFLECTION</span>
@@ -97,11 +122,11 @@
           <div class="flex flex-wrap items-center gap-4 mb-6">
             <a href="#pricing" class="inline-flex items-center gap-2 bg-white text-black font-medium text-sm px-6 py-3 rounded-full hover:bg-[#E5E5E5] transition-all">
               <span>Get Jarvis</span>
-              <img src="/public/icons/icon-arrow.svg" alt="" class="w-4 h-4">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </a>
-            <button data-demo-trigger class="inline-flex items-center gap-3 px-5 py-3 rounded-full border border-[#252525] bg-[#0A0A0A] hover:border-[#383838] transition-all text-sm font-medium text-[#F5F5F5]">
+            <button onclick="openDemoModal()" class="inline-flex items-center gap-3 px-5 py-3 rounded-full border border-[#252525] bg-[#0A0A0A] hover:border-[#383838] transition-all text-sm font-medium text-[#F5F5F5]">
               <span class="w-6 h-6 rounded-full bg-[#181818] flex items-center justify-center">
-                <img src="/public/icons/icon-play.svg" alt="" class="w-2.5 h-2.5 translate-x-0.5">
+                <svg class="w-2.5 h-2.5 fill-current translate-x-0.5" viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
               </span>
               <span>Watch Demo (1:24)</span>
             </button>
@@ -112,72 +137,63 @@
             <span>Available for Windows and macOS desktop</span>
           </div>
 
-          <!-- Feature Pills matching reference bottom hero -->
+          <!-- Feature Pills -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-12 mt-12 border-t border-[#1C1C1C]">
-            <div class="flex items-center gap-2.5">
-              <img src="/public/icons/icon-voice.svg" alt="" class="w-4 h-4 text-[#A3A3A3]">
-              <span class="text-xs text-[#A3A3A3] font-medium">Voice Control</span>
+            <div class="flex items-center gap-2 text-xs text-[#A3A3A3]">
+              <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+              <span>Voice Control</span>
             </div>
-            <div class="flex items-center gap-2.5">
-              <img src="/public/icons/icon-journal.svg" alt="" class="w-4 h-4 text-[#A3A3A3]">
-              <span class="text-xs text-[#A3A3A3] font-medium">Auto Journal</span>
+            <div class="flex items-center gap-2 text-xs text-[#A3A3A3]">
+              <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
+              <span>Auto Journal</span>
             </div>
-            <div class="flex items-center gap-2.5">
-              <img src="/public/icons/icon-analysis.svg" alt="" class="w-4 h-4 text-[#A3A3A3]">
-              <span class="text-xs text-[#A3A3A3] font-medium">Trade Review</span>
+            <div class="flex items-center gap-2 text-xs text-[#A3A3A3]">
+              <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/><path d="M3 12h18"/></svg>
+              <span>Trade Review</span>
             </div>
-            <div class="flex items-center gap-2.5">
-              <img src="/public/icons/icon-desktop.svg" alt="" class="w-4 h-4 text-[#A3A3A3]">
-              <span class="text-xs text-[#A3A3A3] font-medium">Desktop App</span>
+            <div class="flex items-center gap-2 text-xs text-[#A3A3A3]">
+              <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/></svg>
+              <span>Desktop App</span>
             </div>
           </div>
         </div>
 
-        <!-- Hero Right Column: Cinematic Visual & Floating Glass Panels -->
-        <div class="lg:col-span-6 relative flex items-center justify-center min-h-[460px]">
-          <!-- Three.js Ambient Fallback/Enhancement Background -->
-          <div id="hero-canvas-container" class="absolute inset-0 z-0 pointer-events-none"></div>
-
-          <!-- Video / Cinematic Core -->
-          <div class="relative w-full max-w-[500px] aspect-square rounded-2xl overflow-hidden border border-[#252525] bg-[#0A0A0A] flex items-center justify-center jarvis-panel-glow">
-            <video data-jarvis-video muted loop playsinline class="w-full h-full object-cover opacity-75" poster="/public/images/jarvis-hero-poster.webp">
-              <source src="/public/videos/jarvis-hero.mp4" type="video/mp4">
+        <!-- Right Visual (Hero Video/HUD) -->
+        <div class="lg:col-span-6 relative flex items-center justify-center min-h-[440px]">
+          <div class="relative w-full max-w-[480px] aspect-square rounded-2xl overflow-hidden border border-[#252525] bg-[#0A0A0A] flex items-center justify-center shadow-2xl">
+            <!-- Video Player (Auto-Muted) -->
+            <video autoplay muted loop playsinline class="w-full h-full object-cover opacity-60">
+              <source src="./public/videos/jarvis-hero.mp4" type="video/mp4">
             </video>
-            <!-- Overlay visual AI Core in case video is not yet provided -->
-            <div class="absolute inset-0 flex flex-col items-center justify-center bg-radial-gradient pointer-events-none">
-              <div class="w-28 h-28 rounded-full border border-white/20 flex items-center justify-center animate-pulse">
-                <img src="/public/icons/jarvis-logo.svg" alt="" class="w-12 h-12 opacity-80">
+
+            <!-- Holographic Center Orb -->
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div class="w-24 h-24 rounded-full border border-white/20 flex items-center justify-center animate-pulse bg-white/5">
+                <svg class="w-10 h-10" viewBox="0 0 32 32" fill="none">
+                  <polygon points="16,6 24,22 16,19 8,22" fill="#F5F5F5"/>
+                </svg>
               </div>
             </div>
 
-            <!-- Floating Glass HUD 1: Voice Session (Top-Left) -->
-            <div class="absolute top-5 left-5 jarvis-panel rounded-xl p-3.5 max-w-[210px] z-10 shadow-2xl">
-              <div class="flex items-center gap-2 mb-2">
+            <!-- Floating Card 1 -->
+            <div class="absolute top-5 left-5 jarvis-panel rounded-xl p-3.5 max-w-[210px] z-10">
+              <div class="flex items-center gap-2 mb-1.5">
                 <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
-                <span class="text-[11px] font-mono tracking-wider text-white uppercase">Voice Session</span>
+                <span class="text-[10px] font-mono tracking-wider text-white uppercase">Voice Session</span>
               </div>
-              <p class="text-[12px] text-[#A3A3A3] leading-snug">"Jarvis, log a short trade on NQ at 18,240, stop above pivot."</p>
+              <p class="text-[11px] text-[#A3A3A3] leading-snug">"Jarvis, log a short trade on NQ at 18,240, stop above pivot."</p>
             </div>
 
-            <!-- Floating Glass HUD 2: AI Workflow Badge (Bottom-Right) -->
-            <div class="absolute bottom-5 right-5 jarvis-panel rounded-xl p-3.5 min-w-[220px] z-10 shadow-2xl">
+            <!-- Floating Card 2 -->
+            <div class="absolute bottom-5 right-5 jarvis-panel rounded-xl p-3.5 min-w-[210px] z-10">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-[11px] font-mono text-[#A3A3A3]">Workflow Status</span>
-                <span class="text-[10px] font-mono text-white bg-white/10 px-1.5 py-0.5 rounded">Active</span>
+                <span class="text-[10px] font-mono text-[#A3A3A3]">Workflow Status</span>
+                <span class="text-[9px] font-mono text-white bg-white/10 px-1.5 py-0.5 rounded">Active</span>
               </div>
-              <div class="space-y-1.5 text-[11px] text-[#A3A3A3]">
-                <div class="flex items-center gap-1.5">
-                  <img src="/public/icons/icon-check.svg" alt="" class="w-3.5 h-3.5">
-                  <span class="text-white">Audio transcribed</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <img src="/public/icons/icon-check.svg" alt="" class="w-3.5 h-3.5">
-                  <span>Structured journal updated</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <img src="/public/icons/icon-check.svg" alt="" class="w-3.5 h-3.5">
-                  <span>Risk parameters logged</span>
-                </div>
+              <div class="space-y-1 text-[11px] text-[#A3A3A3]">
+                <div class="flex items-center gap-1.5 text-white">✓ Audio transcribed</div>
+                <div class="flex items-center gap-1.5">✓ Journal updated</div>
+                <div class="flex items-center gap-1.5">✓ Risk logged</div>
               </div>
             </div>
           </div>
@@ -185,463 +201,178 @@
       </div>
     </section>
 
-    <!-- ================= SECTION 3: FEATURE OVERVIEW ================= -->
-    <section id="features" class="py-24 border-t border-[#1C1C1C] relative">
+    <!-- ================= FEATURES GRID ================= -->
+    <section id="features" class="py-24 border-t border-[#1C1C1C]">
       <div class="max-w-7xl mx-auto px-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">
           <div class="lg:col-span-5">
             <span class="text-xs font-mono uppercase tracking-widest text-[#A3A3A3] mb-3 block">Dedicated Capabilities</span>
             <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
-              Everything You Need in One Companion
+              Everything You Need in One Place
             </h2>
             <p class="text-[#A3A3A3] text-sm leading-relaxed mb-6">
-              From verbal trade entries to post-market debriefs, Jarvis eliminates context switching and keeps your focus locked on execution.
+              Eliminate context switching and keep your focus locked on trade execution.
             </p>
             <a href="#downloads" class="inline-flex items-center gap-2 text-sm font-medium text-white hover:text-[#A3A3A3] transition-colors">
               <span>Explore Desktop Applications</span>
-              <img src="/public/icons/icon-arrow.svg" alt="" class="w-3.5 h-3.5">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </a>
           </div>
 
-          <!-- 2x2 Feature Grid -->
           <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Card 1 -->
             <div class="bg-[#0C0C0C] border border-[#252525] p-6 rounded-2xl hover-border-glow">
-              <div class="w-10 h-10 rounded-lg bg-[#141414] border border-[#252525] flex items-center justify-center mb-5">
-                <img src="/public/icons/icon-voice.svg" alt="" class="w-5 h-5">
-              </div>
               <h3 class="text-base font-semibold text-white mb-2">Advanced Voice Control</h3>
-              <p class="text-xs text-[#A3A3A3] leading-relaxed">
-                Interact with Jarvis naturally through voice and execute supported assistant actions without constantly switching broker windows.
-              </p>
+              <p class="text-xs text-[#A3A3A3] leading-relaxed">Interact naturally through voice and execute assistant actions without switching windows.</p>
             </div>
-
-            <!-- Card 2 -->
             <div class="bg-[#0C0C0C] border border-[#252525] p-6 rounded-2xl hover-border-glow">
-              <div class="w-10 h-10 rounded-lg bg-[#141414] border border-[#252525] flex items-center justify-center mb-5">
-                <img src="/public/icons/icon-journal.svg" alt="" class="w-5 h-5">
-              </div>
               <h3 class="text-base font-semibold text-white mb-2">Intelligent Trading Journal</h3>
-              <p class="text-xs text-[#A3A3A3] leading-relaxed">
-                Organize trade notes, record market observations, and build a structured, standardized record of your trading decisions automatically.
-              </p>
+              <p class="text-xs text-[#A3A3A3] leading-relaxed">Standardize and maintain structured records of market observations automatically.</p>
             </div>
-
-            <!-- Card 3 -->
             <div class="bg-[#0C0C0C] border border-[#252525] p-6 rounded-2xl hover-border-glow">
-              <div class="w-10 h-10 rounded-lg bg-[#141414] border border-[#252525] flex items-center justify-center mb-5">
-                <img src="/public/icons/icon-analysis.svg" alt="" class="w-5 h-5">
-              </div>
               <h3 class="text-base font-semibold text-white mb-2">AI Trade Review</h3>
-              <p class="text-xs text-[#A3A3A3] leading-relaxed">
-                Use AI assistance to reflect on trade decisions, review recorded emotional notes, and identify systemic habits worth investigating.
-              </p>
+              <p class="text-xs text-[#A3A3A3] leading-relaxed">Reflect on past decisions, detect emotional biases, and identify bad trading habits.</p>
             </div>
-
-            <!-- Card 4 -->
             <div class="bg-[#0C0C0C] border border-[#252525] p-6 rounded-2xl hover-border-glow">
-              <div class="w-10 h-10 rounded-lg bg-[#141414] border border-[#252525] flex items-center justify-center mb-5">
-                <img src="/public/icons/icon-desktop.svg" alt="" class="w-5 h-5">
-              </div>
-              <h3 class="text-base font-semibold text-white mb-2">Dedicated Desktop Assistant</h3>
-              <p class="text-xs text-[#A3A3A3] leading-relaxed">
-                Native macOS and Windows architecture crafted for whisper-quiet performance, instant global hotkeys, and low latency.
-              </p>
+              <h3 class="text-base font-semibold text-white mb-2">Dedicated Desktop App</h3>
+              <p class="text-xs text-[#A3A3A3] leading-relaxed">Ultra-low CPU usage and global hotkeys designed specifically for active workstations.</p>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ================= SECTION 4: CINEMATIC PRODUCT EXPERIENCE ================= -->
-    <section id="experience" class="relative py-32 border-t border-[#1C1C1C] overflow-hidden bg-[#0A0A0A]">
-      <!-- Background AI Video Container -->
-      <div class="absolute inset-0 z-0 opacity-40">
-        <video data-jarvis-video muted loop playsinline class="w-full h-full object-cover" poster="/public/images/jarvis-cinematic-poster.webp">
-          <source src="/public/videos/jarvis-cinematic.mp4" type="video/mp4">
-        </video>
-        <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-[#050505]"></div>
-      </div>
-
-      <div class="relative z-10 max-w-7xl mx-auto px-6 text-center">
-        <span class="text-xs font-mono tracking-widest uppercase text-[#A3A3A3] mb-4 inline-block">The Philosophy</span>
-        <h2 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-6">
-          Think Clearly. Trade Deliberately.
-        </h2>
-        <p class="max-w-2xl mx-auto text-base sm:text-lg text-[#A3A3A3] leading-relaxed mb-10">
-          A dedicated AI companion that helps you organize your trading process, capture subjective thoughts without friction, and review decisions with zero emotional bias.
-        </p>
-
-        <button data-demo-trigger class="inline-flex items-center gap-3 bg-white text-black px-6 py-3.5 rounded-full font-medium text-sm hover:bg-[#E5E5E5] transition-all">
-          <img src="/public/icons/icon-play.svg" alt="" class="w-3 h-3">
-          <span>Watch Product Walkthrough</span>
-        </button>
-      </div>
-    </section>
-
-    <!-- ================= SECTION 5: HOW IT WORKS ================= -->
-    <section id="how-it-works" class="py-24 border-t border-[#1C1C1C]">
-      <div class="max-w-7xl mx-auto px-6">
-        <div class="text-center max-w-xl mx-auto mb-16">
-          <span class="text-xs font-mono uppercase tracking-widest text-[#A3A3A3] mb-3 block">Workflow Integration</span>
-          <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
-            From Your Voice to Your Workflow
-          </h2>
-          <p class="text-sm text-[#A3A3A3]">
-            Three straightforward steps to integrate intelligent voice assistance into your trading environment.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- Step 1 -->
-          <div class="bg-[#0C0C0C] border border-[#252525] p-8 rounded-2xl relative">
-            <span class="text-3xl font-mono font-bold text-white/20 mb-4 block">01</span>
-            <h3 class="text-lg font-semibold text-white mb-2">Install Jarvis</h3>
-            <p class="text-xs text-[#A3A3A3] leading-relaxed mb-6">
-              Download the official desktop application for Windows or macOS. Installation takes under one minute.
-            </p>
-            <div class="h-24 bg-[#050505] rounded-xl border border-[#1E1E1E] flex items-center justify-center p-4">
-              <span class="text-xs font-mono text-[#A3A3A3]">jarvis-setup.exe / .dmg</span>
-            </div>
-          </div>
-
-          <!-- Step 2 -->
-          <div class="bg-[#0C0C0C] border border-[#252525] p-8 rounded-2xl relative">
-            <span class="text-3xl font-mono font-bold text-white/20 mb-4 block">02</span>
-            <h3 class="text-lg font-semibold text-white mb-2">Connect Your Account</h3>
-            <p class="text-xs text-[#A3A3A3] leading-relaxed mb-6">
-              Sign in with your verified email address to synchronize your subscription plan and active token balance.
-            </p>
-            <div class="h-24 bg-[#050505] rounded-xl border border-[#1E1E1E] flex items-center justify-center p-4">
-              <span class="text-xs font-mono text-[#A3A3A3]">user@trader.com &bull;&bull;&bull;&bull;</span>
-            </div>
-          </div>
-
-          <!-- Step 3 -->
-          <div class="bg-[#0C0C0C] border border-[#252525] p-8 rounded-2xl relative">
-            <span class="text-3xl font-mono font-bold text-white/20 mb-4 block">03</span>
-            <h3 class="text-lg font-semibold text-white mb-2">Start Your Session</h3>
-            <p class="text-xs text-[#A3A3A3] leading-relaxed mb-6">
-              Use configurable voice hotkeys, record trade notes, and prompt post-market reviews right from your desktop.
-            </p>
-            <div class="h-24 bg-[#050505] rounded-xl border border-[#1E1E1E] flex items-center justify-center p-4">
-              <span class="text-xs font-mono text-white/90">Hotkey: [Ctrl + Space] Active</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= SECTION 6: PERFORMANCE & TECHNOLOGY ================= -->
-    <section id="performance" class="py-24 border-t border-[#1C1C1C] relative bg-[#050505] overflow-hidden">
+    <!-- ================= PERFORMANCE 3D WIREFRAME ================= -->
+    <section id="performance" class="py-24 border-t border-[#1C1C1C] bg-[#050505]">
       <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <!-- Procedural Three.js Wireframe Landscape Matching Reference -->
-        <div class="lg:col-span-5 h-[360px] relative border border-[#252525] rounded-2xl overflow-hidden bg-[#050505]">
+        <!-- Three.js Canvas Container -->
+        <div class="lg:col-span-6 h-[340px] border border-[#252525] rounded-2xl overflow-hidden bg-[#0A0A0A] relative">
           <div id="three-wireframe-container" class="w-full h-full"></div>
           <div class="absolute bottom-3 left-4 text-[11px] font-mono text-[#666666]">
-            Procedural Terrain Engine (Three.js WebGL)
+            Procedural 3D Mesh Engine
           </div>
         </div>
 
-        <!-- Technical Description & Capabilities -->
-        <div class="lg:col-span-7">
-          <span class="text-xs font-mono uppercase tracking-widest text-[#A3A3A3] mb-3 block">Built for Focus</span>
+        <div class="lg:col-span-6">
+          <span class="text-xs font-mono uppercase tracking-widest text-[#A3A3A3] mb-3 block">High Performance</span>
           <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
-            Designed for Speed and Low Overhead
+            Zero Latency. Minimal Footprint.
           </h2>
-          <p class="text-sm text-[#A3A3A3] leading-relaxed mb-8">
-            Jarvis operates with negligible system resources so your primary trading platforms, charting software, and broker connections run completely unhindered.
+          <p class="text-sm text-[#A3A3A3] leading-relaxed mb-6">
+            Jarvis is engineered to operate silently in the background, preserving 100% of your system's rendering performance for your trading execution platforms.
           </p>
-
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6 border-t border-[#252525]">
+          <div class="grid grid-cols-3 gap-6 pt-6 border-t border-[#252525]">
             <div>
-              <span class="text-2xl font-bold text-white font-mono block">Desktop</span>
-              <span class="text-xs text-[#A3A3A3]">Native OS binary</span>
+              <span class="text-2xl font-bold text-white font-mono block">&lt; 50ms</span>
+              <span class="text-xs text-[#A3A3A3]">Voice latency</span>
             </div>
             <div>
-              <span class="text-2xl font-bold text-white font-mono block">Zero Lag</span>
-              <span class="text-xs text-[#A3A3A3]">Lightweight audio buffer</span>
+              <span class="text-2xl font-bold text-white font-mono block">Native</span>
+              <span class="text-xs text-[#A3A3A3]">C++ / Rust Core</span>
             </div>
             <div>
-              <span class="text-2xl font-bold text-white font-mono block">Tokens</span>
-              <span class="text-xs text-[#A3A3A3]">Configurable AI usage</span>
+              <span class="text-2xl font-bold text-white font-mono block">0.2%</span>
+              <span class="text-xs text-[#A3A3A3]">Idle CPU load</span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ================= SECTION 7: PLATFORM DOWNLOADS ================= -->
-    <section id="downloads" class="py-24 border-t border-[#1C1C1C] relative">
-      <div class="max-w-7xl mx-auto px-6">
-        <div class="text-center max-w-xl mx-auto mb-16">
-          <span class="text-xs font-mono uppercase tracking-widest text-[#A3A3A3] mb-3 block">Native Applications</span>
-          <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
-            Your Trading Assistant. On Your Desktop.
-          </h2>
-          <p class="text-sm text-[#A3A3A3]">
-            Bring Jarvis directly into your workstation. Dedicated builds for Windows and macOS.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <!-- Windows Card -->
-          <div class="bg-[#0C0C0C] border border-[#252525] p-8 rounded-2xl hover-border-glow flex flex-col justify-between">
+    <!-- ================= DOWNLOADS ================= -->
+    <section id="downloads" class="py-24 border-t border-[#1C1C1C]">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">Get Jarvis for Your Desktop</h2>
+        <p class="text-sm text-[#A3A3A3] max-w-lg mx-auto mb-12">Universal installer package optimized for Apple Silicon and modern 64-bit Windows systems.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+          <!-- Windows -->
+          <div class="bg-[#0C0C0C] border border-[#252525] p-8 rounded-2xl hover-border-glow text-left flex flex-col justify-between">
             <div>
-              <div class="w-12 h-12 rounded-xl bg-[#141414] border border-[#252525] flex items-center justify-center mb-6">
-                <img src="/public/icons/icon-windows.svg" alt="Windows Logo" class="w-6 h-6">
+              <div class="w-10 h-10 rounded-lg bg-[#141414] border border-[#252525] flex items-center justify-center mb-4">
+                <svg class="w-5 h-5 fill-current text-white" viewBox="0 0 32 32"><path d="M2.5 5.2L13.8 3.6V14.8H2.5V5.2ZM13.8 16.8V28.4L2.5 26.8V16.8H13.8ZM15.8 3.3L29.5 1.3V14.8H15.8V3.3ZM29.5 16.8V30.7L15.8 28.7V16.8H29.5Z"/></svg>
               </div>
-              <h3 class="text-xl font-semibold text-white mb-2">Jarvis for Windows</h3>
-              <p class="text-xs text-[#A3A3A3] leading-relaxed mb-6">
-                Your dedicated AI trading companion for Windows desktop. Compatible with Windows 10 and Windows 11 (64-bit).
-              </p>
+              <h3 class="text-lg font-semibold text-white mb-1">Windows</h3>
+              <p class="text-xs text-[#A3A3A3] mb-6">Windows 10 / 11 (64-bit)</p>
             </div>
-            <div>
-              <a href="/downloads/jarvis-setup.exe" class="w-full inline-flex items-center justify-center gap-2 bg-white text-black text-sm font-medium py-3 rounded-xl hover:bg-[#E5E5E5] transition-all">
-                <span>Download for Windows</span>
-                <img src="/public/icons/icon-arrow.svg" alt="" class="w-3.5 h-3.5">
-              </a>
-              <span class="text-[11px] font-mono text-[#666666] text-center block mt-2.5">x64 Architecture &middot; Installer (.exe)</span>
-            </div>
+            <a href="#" class="w-full text-center bg-white text-black text-xs font-semibold py-3 rounded-xl hover:bg-[#E5E5E5] transition-all">Download (.exe)</a>
           </div>
 
-          <!-- macOS Card -->
-          <div class="bg-[#0C0C0C] border border-[#252525] p-8 rounded-2xl hover-border-glow flex flex-col justify-between">
+          <!-- Mac -->
+          <div class="bg-[#0C0C0C] border border-[#252525] p-8 rounded-2xl hover-border-glow text-left flex flex-col justify-between">
             <div>
-              <div class="w-12 h-12 rounded-xl bg-[#141414] border border-[#252525] flex items-center justify-center mb-6">
-                <img src="/public/icons/icon-apple.svg" alt="Apple Logo" class="w-6 h-6">
+              <div class="w-10 h-10 rounded-lg bg-[#141414] border border-[#252525] flex items-center justify-center mb-4">
+                <svg class="w-5 h-5 fill-current text-white" viewBox="0 0 32 32"><path d="M20.5 4.5C21.6 3.1 22.4 1.2 22.2 0C20.6 0.1 18.7 1.1 17.6 2.4C16.6 3.6 15.7 5.5 16 6.7C17.8 6.8 19.5 5.8 20.5 4.5ZM24.6 13.9C24.5 10.3 27.5 8.5 27.6 8.4C25.9 5.9 23.3 5.6 22.4 5.5C20.2 5.3 18 6.9 16.9 6.9C15.7 6.9 13.9 5.5 12.2 5.5C10 5.5 7.9 6.8 6.8 8.7C4.5 12.7 6.2 18.7 8.4 21.9C9.5 23.5 10.8 25.2 12.5 25.1C14.2 25 14.8 24 16.9 24C18.9 24 19.5 25.1 21.3 25.1C23.1 25.1 24.2 23.6 25.3 22C26.6 20.1 27.1 18.3 27.2 18.2C27.1 18.1 24.6 17.1 24.6 13.9Z"/></svg>
               </div>
-              <h3 class="text-xl font-semibold text-white mb-2">Jarvis for macOS</h3>
-              <p class="text-xs text-[#A3A3A3] leading-relaxed mb-6">
-                Your dedicated AI trading companion for Mac. Universal binary optimized for Apple Silicon (M1/M2/M3) and Intel.
-              </p>
+              <h3 class="text-lg font-semibold text-white mb-1">macOS</h3>
+              <p class="text-xs text-[#A3A3A3] mb-6">Apple Silicon & Intel</p>
             </div>
-            <div>
-              <a href="/downloads/jarvis-setup.dmg" class="w-full inline-flex items-center justify-center gap-2 bg-white text-black text-sm font-medium py-3 rounded-xl hover:bg-[#E5E5E5] transition-all">
-                <span>Download for Mac</span>
-                <img src="/public/icons/icon-arrow.svg" alt="" class="w-3.5 h-3.5">
-              </a>
-              <span class="text-[11px] font-mono text-[#666666] text-center block mt-2.5">Apple Silicon & Intel &middot; Disk Image (.dmg)</span>
-            </div>
+            <a href="#" class="w-full text-center bg-white text-black text-xs font-semibold py-3 rounded-xl hover:bg-[#E5E5E5] transition-all">Download (.dmg)</a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ================= SECTION 8: PRICING ================= -->
+    <!-- ================= PRICING ================= -->
     <section id="pricing" class="py-24 border-t border-[#1C1C1C]">
-      <div class="max-w-7xl mx-auto px-6">
-        <div class="text-center max-w-xl mx-auto mb-16">
-          <span class="text-xs font-mono uppercase tracking-widest text-[#A3A3A3] mb-3 block">Simple Subscriptions</span>
-          <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
-            Choose Your Plan
-          </h2>
-          <p class="text-sm text-[#A3A3A3]">
-            Access Jarvis through your account and use the AI assistant features available under your subscription and token balance.
-          </p>
-        </div>
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">Choose Your Plan</h2>
+        <p class="text-sm text-[#A3A3A3] mb-12">Access Jarvis through your account on all supported devices.</p>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto mb-12">
-          <!-- Monthly Plan -->
-          <div class="bg-[#0C0C0C] border border-[#252525] p-8 rounded-2xl flex flex-col justify-between hover-border-glow">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto mb-10 text-left">
+          <!-- Monthly -->
+          <div class="bg-[#0C0C0C] border border-[#252525] p-8 rounded-2xl flex flex-col justify-between">
             <div>
-              <div class="flex items-center justify-between mb-4">
-                <span class="text-sm font-mono text-[#A3A3A3]">Monthly Subscription</span>
-              </div>
-              <div class="flex items-baseline gap-2 mb-6">
-                <span class="text-4xl sm:text-5xl font-bold text-white font-mono">$12</span>
+              <span class="text-xs font-mono text-[#A3A3A3] block mb-2">Monthly</span>
+              <div class="flex items-baseline gap-2 mb-4">
+                <span class="text-4xl font-bold text-white font-mono">$12</span>
                 <span class="text-xs text-[#A3A3A3]">/ month</span>
               </div>
-              <p class="text-xs text-[#A3A3A3] leading-relaxed mb-6">
-                Access Jarvis through your account and use the AI assistant features available under your subscription and token balance.
-              </p>
-              <ul class="space-y-3 text-xs text-[#A3A3A3] mb-8">
-                <li class="flex items-center gap-2.5">
-                  <img src="/public/icons/icon-check.svg" alt="" class="w-3.5 h-3.5">
-                  <span>Full desktop app access (Windows & macOS)</span>
-                </li>
-                <li class="flex items-center gap-2.5">
-                  <img src="/public/icons/icon-check.svg" alt="" class="w-3.5 h-3.5">
-                  <span>Voice command recognition & trading journal</span>
-                </li>
-                <li class="flex items-center gap-2.5">
-                  <img src="/public/icons/icon-check.svg" alt="" class="w-3.5 h-3.5">
-                  <span>Standard AI token allowance included</span>
-                </li>
-              </ul>
+              <p class="text-xs text-[#A3A3A3] mb-6">Standard desktop usage with automated trade logging.</p>
             </div>
-            <a href="/api/v1/checkout/monthly" class="w-full inline-flex items-center justify-center py-3 rounded-xl border border-[#252525] text-white hover:border-[#383838] transition-all text-xs font-medium">
-              Choose Monthly
-            </a>
+            <button class="w-full border border-[#252525] text-white py-2.5 rounded-xl text-xs font-medium hover:border-white transition-all">Select Monthly</button>
           </div>
 
-          <!-- Annual Plan (Highlighted matching reference 'Pro' card) -->
-          <div class="bg-[#0C0C0C] border border-white/40 p-8 rounded-2xl flex flex-col justify-between relative shadow-2xl">
-            <div class="absolute -top-3 right-6 bg-white text-black text-[10px] font-mono px-3 py-0.5 rounded-full uppercase tracking-wider font-semibold">
-              Most Popular
-            </div>
+          <!-- Annual -->
+          <div class="bg-[#0C0C0C] border border-white/50 p-8 rounded-2xl flex flex-col justify-between relative shadow-2xl">
+            <span class="absolute -top-3 right-6 bg-white text-black text-[10px] font-mono px-3 py-0.5 rounded-full font-bold uppercase">Popular</span>
             <div>
-              <div class="flex items-center justify-between mb-4">
-                <span class="text-sm font-mono text-[#A3A3A3]">Annual Subscription</span>
-                <span class="text-[11px] font-mono text-white/80">~$11.08 / mo</span>
-              </div>
-              <div class="flex items-baseline gap-2 mb-6">
-                <span class="text-4xl sm:text-5xl font-bold text-white font-mono">$133</span>
+              <span class="text-xs font-mono text-[#A3A3A3] block mb-2">Annual</span>
+              <div class="flex items-baseline gap-2 mb-4">
+                <span class="text-4xl font-bold text-white font-mono">$133</span>
                 <span class="text-xs text-[#A3A3A3]">/ year</span>
               </div>
-              <p class="text-xs text-[#A3A3A3] leading-relaxed mb-6">
-                Access Jarvis through your account and use the AI assistant features available under your subscription and token balance.
-              </p>
-              <ul class="space-y-3 text-xs text-[#A3A3A3] mb-8">
-                <li class="flex items-center gap-2.5">
-                  <img src="/public/icons/icon-check.svg" alt="" class="w-3.5 h-3.5">
-                  <span class="text-white">All Monthly features included</span>
-                </li>
-                <li class="flex items-center gap-2.5">
-                  <img src="/public/icons/icon-check.svg" alt="" class="w-3.5 h-3.5">
-                  <span class="text-white">Annual billing discount applied</span>
-                </li>
-                <li class="flex items-center gap-2.5">
-                  <img src="/public/icons/icon-check.svg" alt="" class="w-3.5 h-3.5">
-                  <span class="text-white">Priority access to new desktop versions</span>
-                </li>
-              </ul>
+              <p class="text-xs text-[#A3A3A3] mb-6">Billed annually (~$11.08/mo). Full desktop access.</p>
             </div>
-            <a href="/api/v1/checkout/annual" class="w-full inline-flex items-center justify-center py-3 rounded-xl bg-white text-black hover:bg-[#E5E5E5] transition-all text-xs font-semibold">
-              Choose Annual
-            </a>
+            <button class="w-full bg-white text-black py-2.5 rounded-xl text-xs font-semibold hover:bg-[#E5E5E5] transition-all">Select Annual</button>
           </div>
         </div>
 
-        <!-- Token System Clarification Note -->
-        <div class="max-w-2xl mx-auto text-center border border-[#252525] bg-[#0A0A0A] p-6 rounded-xl">
-          <h3 class="text-sm font-semibold text-white mb-2">Need more AI usage?</h3>
-          <p class="text-xs text-[#A3A3A3] leading-relaxed mb-4">
-            Top up your token balance whenever additional usage is needed. Token top-ups and core subscriptions are managed independently.
-          </p>
-          <a href="/dashboard/tokens" class="inline-flex items-center gap-2 text-xs font-medium text-white hover:text-[#A3A3A3] transition-colors">
-            <span>Explore Token Top-Ups</span>
-            <img src="/public/icons/icon-arrow.svg" alt="" class="w-3 h-3">
-          </a>
-        </div>
+        <p class="text-xs text-[#666666]">Need more AI usage? Top up your token balance whenever additional usage is needed.</p>
       </div>
     </section>
 
-    <!-- ================= SECTION 10: FAQ ================= -->
+    <!-- ================= FAQ ================= -->
     <section id="faq" class="py-24 border-t border-[#1C1C1C]">
-      <div class="max-w-4xl mx-auto px-6">
-        <div class="text-center mb-16">
-          <span class="text-xs font-mono uppercase tracking-widest text-[#A3A3A3] mb-3 block">Questions & Answers</span>
-          <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
-            Frequently Asked Questions
-          </h2>
-          <p class="text-sm text-[#A3A3A3]">
-            Transparent answers regarding Jarvis capabilities, tokens, and billing.
-          </p>
-        </div>
-
-        <div class="space-y-4">
-          <!-- Item 1 -->
+      <div class="max-w-3xl mx-auto px-6">
+        <h2 class="text-3xl font-bold tracking-tight text-white text-center mb-12">Frequently Asked Questions</h2>
+        <div class="space-y-3">
           <div class="border border-[#252525] rounded-xl overflow-hidden bg-[#0A0A0A]">
-            <button data-accordion-btn aria-expanded="false" class="w-full px-6 py-4 text-left flex items-center justify-between text-sm font-medium text-white hover:bg-[#111111] transition-colors">
+            <button onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex justify-between items-center text-sm font-medium text-white">
               <span>What is Jarvis?</span>
-              <svg class="w-4 h-4 text-[#A3A3A3] accordion-icon transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              <span class="text-lg leading-none">+</span>
             </button>
-            <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out px-6">
-              <p class="py-4 text-xs text-[#A3A3A3] leading-relaxed border-t border-[#1C1C1C]">
-                Jarvis is a dedicated desktop AI companion built exclusively for active traders. It streamlines trading workflow management through natural voice commands, automated journaling, and unbiased trade reflection.
-              </p>
+            <div class="hidden px-6 pb-4 text-xs text-[#A3A3A3] leading-relaxed border-t border-[#1C1C1C] pt-3">
+              Jarvis is a dedicated desktop AI companion built exclusively for active traders to automate voice journaling and trade review.
             </div>
           </div>
 
-          <!-- Item 2 -->
           <div class="border border-[#252525] rounded-xl overflow-hidden bg-[#0A0A0A]">
-            <button data-accordion-btn aria-expanded="false" class="w-full px-6 py-4 text-left flex items-center justify-between text-sm font-medium text-white hover:bg-[#111111] transition-colors">
-              <span>Which operating systems are supported?</span>
-              <svg class="w-4 h-4 text-[#A3A3A3] accordion-icon transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </button>
-            <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out px-6">
-              <p class="py-4 text-xs text-[#A3A3A3] leading-relaxed border-t border-[#1C1C1C]">
-                Jarvis currently supports Windows 10/11 (64-bit) and macOS (Apple Silicon M-Series and Intel processors).
-              </p>
-            </div>
-          </div>
-
-          <!-- Item 3 -->
-          <div class="border border-[#252525] rounded-xl overflow-hidden bg-[#0A0A0A]">
-            <button data-accordion-btn aria-expanded="false" class="w-full px-6 py-4 text-left flex items-center justify-between text-sm font-medium text-white hover:bg-[#111111] transition-colors">
-              <span>How does Jarvis use AI tokens?</span>
-              <svg class="w-4 h-4 text-[#A3A3A3] accordion-icon transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </button>
-            <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out px-6">
-              <p class="py-4 text-xs text-[#A3A3A3] leading-relaxed border-t border-[#1C1C1C]">
-                AI interactions such as audio transcription, structured note generation, and debrief analyses consume credits from your token balance based on request complexity and model selection.
-              </p>
-            </div>
-          </div>
-
-          <!-- Item 4 -->
-          <div class="border border-[#252525] rounded-xl overflow-hidden bg-[#0A0A0A]">
-            <button data-accordion-btn aria-expanded="false" class="w-full px-6 py-4 text-left flex items-center justify-between text-sm font-medium text-white hover:bg-[#111111] transition-colors">
-              <span>Can I purchase additional tokens?</span>
-              <svg class="w-4 h-4 text-[#A3A3A3] accordion-icon transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </button>
-            <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out px-6">
-              <p class="py-4 text-xs text-[#A3A3A3] leading-relaxed border-t border-[#1C1C1C]">
-                Yes. If your trading frequency requires additional AI reasoning or high-volume voice logging, you can top up your token balance at any time from your account dashboard.
-              </p>
-            </div>
-          </div>
-
-          <!-- Item 5 -->
-          <div class="border border-[#252525] rounded-xl overflow-hidden bg-[#0A0A0A]">
-            <button data-accordion-btn aria-expanded="false" class="w-full px-6 py-4 text-left flex items-center justify-between text-sm font-medium text-white hover:bg-[#111111] transition-colors">
-              <span>Can I use the same account in the desktop application?</span>
-              <svg class="w-4 h-4 text-[#A3A3A3] accordion-icon transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </button>
-            <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out px-6">
-              <p class="py-4 text-xs text-[#A3A3A3] leading-relaxed border-t border-[#1C1C1C]">
-                Yes. You log in to the Windows or macOS desktop application with the exact same credentials used during web checkout.
-              </p>
-            </div>
-          </div>
-
-          <!-- Item 6 -->
-          <div class="border border-[#252525] rounded-xl overflow-hidden bg-[#0A0A0A]">
-            <button data-accordion-btn aria-expanded="false" class="w-full px-6 py-4 text-left flex items-center justify-between text-sm font-medium text-white hover:bg-[#111111] transition-colors">
+            <button onclick="toggleFaq(this)" class="w-full px-6 py-4 text-left flex justify-between items-center text-sm font-medium text-white">
               <span>Is Jarvis an automated trading bot?</span>
-              <svg class="w-4 h-4 text-[#A3A3A3] accordion-icon transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              <span class="text-lg leading-none">+</span>
             </button>
-            <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out px-6">
-              <p class="py-4 text-xs text-[#A3A3A3] leading-relaxed border-t border-[#1C1C1C]">
-                No. Jarvis is an assistant and workflow companion. It does not place unsolicited market orders or operate black-box execution algorithms.
-              </p>
-            </div>
-          </div>
-
-          <!-- Item 7 -->
-          <div class="border border-[#252525] rounded-xl overflow-hidden bg-[#0A0A0A]">
-            <button data-accordion-btn aria-expanded="false" class="w-full px-6 py-4 text-left flex items-center justify-between text-sm font-medium text-white hover:bg-[#111111] transition-colors">
-              <span>Does Jarvis guarantee profitable trading?</span>
-              <svg class="w-4 h-4 text-[#A3A3A3] accordion-icon transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </button>
-            <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out px-6">
-              <p class="py-4 text-xs text-[#A3A3A3] leading-relaxed border-t border-[#1C1C1C]">
-                No. Trading financial instruments carries substantial risk of loss. Jarvis provides productivity, organization, and analytical assistance; it does not guarantee profits or provide investment advisory services.
-              </p>
-            </div>
-          </div>
-
-          <!-- Item 8 -->
-          <div class="border border-[#252525] rounded-xl overflow-hidden bg-[#0A0A0A]">
-            <button data-accordion-btn aria-expanded="false" class="w-full px-6 py-4 text-left flex items-center justify-between text-sm font-medium text-white hover:bg-[#111111] transition-colors">
-              <span>How can I manage or cancel my subscription?</span>
-              <svg class="w-4 h-4 text-[#A3A3A3] accordion-icon transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </button>
-            <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out px-6">
-              <p class="py-4 text-xs text-[#A3A3A3] leading-relaxed border-t border-[#1C1C1C]">
-                Subscriptions can be paused, upgraded, or cancelled anytime directly inside your account billing settings.
-              </p>
+            <div class="hidden px-6 pb-4 text-xs text-[#A3A3A3] leading-relaxed border-t border-[#1C1C1C] pt-3">
+              No. Jarvis is an assistant and workflow companion. It does not place unsolicited market orders or execute black-box algorithms.
             </div>
           </div>
         </div>
@@ -649,135 +380,89 @@
     </section>
   </main>
 
-  <!-- ================= SECTION 11: FOOTER ================= -->
-  <footer class="border-t border-[#1C1C1C] py-16 bg-[#050505] text-[#A3A3A3] text-xs">
-    <div class="max-w-7xl mx-auto px-6">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
-        <div>
-          <div class="flex items-center gap-3 mb-4">
-            <img src="/public/icons/jarvis-logo.svg" alt="" class="w-6 h-6">
-            <span class="font-semibold text-sm text-white">Jarvis</span>
-          </div>
-          <p class="text-xs leading-relaxed text-[#666666]">
-            Dedicated desktop AI assistant for disciplined trading workflows.
-          </p>
-        </div>
-        <div>
-          <h4 class="text-white font-medium mb-3">Product</h4>
-          <ul class="space-y-2">
-            <li><a href="#features" class="hover:text-white transition-colors">Features</a></li>
-            <li><a href="#experience" class="hover:text-white transition-colors">Cinematic Experience</a></li>
-            <li><a href="#performance" class="hover:text-white transition-colors">Performance Engine</a></li>
-            <li><a href="#downloads" class="hover:text-white transition-colors">Platform Downloads</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-white font-medium mb-3">Access & Billing</h4>
-          <ul class="space-y-2">
-            <li><a href="#pricing" class="hover:text-white transition-colors">Subscription Plans</a></li>
-            <li><a href="/dashboard/tokens" class="hover:text-white transition-colors">Token Top-Ups</a></li>
-            <li><button data-auth-trigger="signin" class="hover:text-white transition-colors">Trader Sign In</button></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-white font-medium mb-3">Legal & Safety</h4>
-          <ul class="space-y-2">
-            <li><a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
-            <li><a href="/terms" class="hover:text-white transition-colors">Terms of Service</a></li>
-            <li><span class="text-[#666666] block">Not Financial Advice</span></li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="border-t border-[#1C1C1C] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[#666666]">
-        <span>&copy; <span id="year">2026</span> Jarvis AI Trading Assistant. All rights reserved.</span>
-        <div class="flex items-center gap-4">
-          <a href="#" class="hover:text-white transition-colors">X (Twitter)</a>
-          <a href="#" class="hover:text-white transition-colors">Discord</a>
-        </div>
-      </div>
-    </div>
+  <!-- ================= FOOTER ================= -->
+  <footer class="border-t border-[#1C1C1C] py-12 bg-[#050505] text-center text-xs text-[#666666]">
+    <p>&copy; 2026 Jarvis AI Trading Assistant. All rights reserved.</p>
   </footer>
 
-  <!-- ================= SECTION 9: AUTHENTICATION MODAL ================= -->
-  <div id="auth-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4" role="dialog" aria-modal="true">
-    <div class="bg-[#0C0C0C] border border-[#252525] rounded-2xl max-w-md w-full p-6 relative jarvis-panel-glow">
-      <button data-auth-close class="absolute top-4 right-4 text-[#A3A3A3] hover:text-white p-1" aria-label="Close modal">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
-
-      <!-- Tabs -->
-      <div class="flex border-b border-[#252525] mb-6">
-        <button data-auth-tab="signin" class="flex-1 pb-3 text-xs font-medium border-b-2 text-white border-white transition-all">Sign In</button>
-        <button data-auth-tab="signup" class="flex-1 pb-3 text-xs font-medium border-b-2 text-[#A3A3A3] border-transparent transition-all">Create Account</button>
-        <button data-auth-tab="reset" class="flex-1 pb-3 text-xs font-medium border-b-2 text-[#A3A3A3] border-transparent transition-all">Reset</button>
-      </div>
-
-      <!-- Sign In Form -->
-      <form id="auth-form-signin" class="space-y-4">
-        <div>
-          <label class="block text-xs font-mono text-[#A3A3A3] mb-1.5">Account Email</label>
-          <input type="email" required placeholder="trader@domain.com" class="w-full bg-[#050505] border border-[#252525] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
-        </div>
-        <div>
-          <label class="block text-xs font-mono text-[#A3A3A3] mb-1.5">Password</label>
-          <input type="password" required placeholder="••••••••" class="w-full bg-[#050505] border border-[#252525] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
-        </div>
-        <button type="submit" class="w-full bg-white text-black font-semibold text-xs py-2.5 rounded-lg hover:bg-[#E5E5E5] transition-all">
-          Sign In to Jarvis
-        </button>
-      </form>
-
-      <!-- Sign Up Form -->
-      <form id="auth-form-signup" class="space-y-4 hidden">
-        <div>
-          <label class="block text-xs font-mono text-[#A3A3A3] mb-1.5">Email Address</label>
-          <input type="email" required placeholder="trader@domain.com" class="w-full bg-[#050505] border border-[#252525] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
-        </div>
-        <div>
-          <label class="block text-xs font-mono text-[#A3A3A3] mb-1.5">Create Master Password</label>
-          <input type="password" required placeholder="••••••••" class="w-full bg-[#050505] border border-[#252525] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
-        </div>
-        <button type="submit" class="w-full bg-white text-black font-semibold text-xs py-2.5 rounded-lg hover:bg-[#E5E5E5] transition-all">
-          Create Trader Account
-        </button>
-      </form>
-
-      <!-- Password Reset Form -->
-      <form id="auth-form-reset" class="space-y-4 hidden">
-        <div>
-          <label class="block text-xs font-mono text-[#A3A3A3] mb-1.5">Registered Email</label>
-          <input type="email" required placeholder="trader@domain.com" class="w-full bg-[#050505] border border-[#252525] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-white">
-        </div>
-        <button type="submit" class="w-full bg-white text-black font-semibold text-xs py-2.5 rounded-lg hover:bg-[#E5E5E5] transition-all">
-          Send Reset Instructions
-        </button>
-      </form>
-
-      <div id="auth-status-message"></div>
-    </div>
-  </div>
-
-  <!-- Video Walkthrough Modal -->
-  <div id="demo-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 p-4" role="dialog">
-    <div class="relative w-full max-w-4xl aspect-video bg-[#0C0C0C] border border-[#252525] rounded-2xl overflow-hidden">
-      <button data-demo-close class="absolute top-4 right-4 text-white z-10 bg-black/60 p-2 rounded-full" aria-label="Close demo">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
-      <div class="w-full h-full flex flex-col items-center justify-center p-8 text-center">
-        <img src="/public/icons/jarvis-logo.svg" alt="" class="w-12 h-12 mb-4 opacity-50">
-        <h3 class="text-lg font-semibold text-white mb-2">Jarvis Desktop Walkthrough</h3>
-        <p class="text-xs text-[#A3A3A3] max-w-md">
-          Connect your video asset (<code>jarvis-cinematic.mp4</code>) or stream provider to preview voice recording and journal reflection in action.
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Application Entry Point -->
-  <script type="module" src="/src/js/main.js"></script>
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+    // 1. ABSOLUTE AUDIO MUTE GUARD (Kisi bhi video ka music sunai nahi dega)
+    document.querySelectorAll('video').forEach(video => {
+      video.muted = true;
+      video.defaultMuted = true;
+      video.volume = 0;
+      video.addEventListener('volumechange', () => {
+        if (!video.muted || video.volume > 0) {
+          video.muted = true;
+          video.volume = 0;
+        }
+      });
+    });
+
+    // 2. FAQ Accordion Toggle
+    function toggleFaq(btn) {
+      const content = btn.nextElementSibling;
+      const icon = btn.querySelector('span:last-child');
+      const isHidden = content.classList.contains('hidden');
+      content.classList.toggle('hidden', !isHidden);
+      icon.textContent = isHidden ? '−' : '+';
+    }
+
+    // 3. Three.js 3D Wireframe Scene Initialization
+    function init3DWireframe() {
+      const container = document.getElementById('three-wireframe-container');
+      if (!container || typeof THREE === 'undefined') return;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+      camera.position.set(0, 5, 10);
+      camera.lookAt(0, 0, 0);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+
+      // Wireframe Plane
+      const geom = new THREE.PlaneGeometry(16, 16, 28, 28);
+      geom.rotateX(-Math.PI / 2);
+      const pos = geom.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i);
+        const z = pos.getZ(i);
+        pos.setY(i, Math.sin(x * 0.5) * Math.cos(z * 0.5) * 1.2);
+      }
+      geom.computeVertexNormals();
+
+      const mat = new THREE.MeshBasicMaterial({ color: 0x444444, wireframe: true });
+      const mesh = new THREE.Mesh(geom, mat);
+      scene.add(mesh);
+
+      // Floating Orb
+      const sphereGeom = new THREE.SphereGeometry(0.8, 24, 24);
+      const sphereMat = new THREE.MeshBasicMaterial({ color: 0x888888, wireframe: true });
+      const sphere = new THREE.Mesh(sphereGeom, sphereMat);
+      sphere.position.set(0, 2, 0);
+      scene.add(sphere);
+
+      let clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const t = clock.getElapsedTime();
+        sphere.position.y = 2 + Math.sin(t * 1.5) * 0.3;
+        mesh.rotation.y = Math.sin(t * 0.2) * 0.05;
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', init3DWireframe);
   </script>
 </body>
 </html>
